@@ -1,3 +1,8 @@
+.metadata
+.metadata\*
+Fanorona/.classpath
+Fanorona/.project
+Fanorona/.settings/
 *.class
 
 # Package Files #
