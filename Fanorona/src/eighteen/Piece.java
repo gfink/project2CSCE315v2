@@ -27,7 +27,7 @@ public class Piece {
 	public Piece(int x, int y, Color c) {
 		row = x;
 		column = y;
-		pState=PieceState.EMPTY;
+		setColor(c);
 		if(!isValidSpace()) {
 			throw new IndexOutOfBoundsException();
 		}
