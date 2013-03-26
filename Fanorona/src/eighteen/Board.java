@@ -32,6 +32,10 @@ public class Board {
 	public static int ROWS;
 	public static int COLUMNS;
 	
+	public Board() {
+		this(5,13);
+	}
+	
 	public Board(int rows, int columns)
 	{ 
 		ROWS = rows;
@@ -61,7 +65,7 @@ public class Board {
 		}
 		whites = (rows * columns) / 2;
 		blacks = whites;
-		//chainMoves
+		chainMoves = new ArrayList<Move>();
 	}
 	
 	public Board(Board b) {
@@ -79,6 +83,7 @@ public class Board {
 		previousSpot = b.previousSpot;
 		previousDirection = b.previousDirection;
 		previousLocations = new ArrayList<Piece>(b.previousLocations);
+		chainMoves = new ArrayList<Move>(b.chainMoves);
 	}
 	
 	public Piece getPiece(int x, int y) {
@@ -119,6 +124,7 @@ public class Board {
 				isChain = false;
 				previousLocations = new ArrayList<Piece>();
 				chainColor = mov.getStart().getColor();
+				chainMoves = new ArrayList<Move>();
 			}
 			else if(mov.getStart() != previousSpot) {
 				throw new BadMoveException("Bad move at [" + mov.getStart().row + ", " + mov.getStart().column + "] -> Wrong starting spot");
@@ -209,37 +215,24 @@ public class Board {
 		previousSpot = mov.getStart();
 		previousDirection = mov.getDirection();
 		previousLocations.add(mov.getStart());
-		
-		
+		chainMoves.add(mov);
 	}
 	
-	private boolean isValidMove(Move mov) {
+	public boolean isValidMove(Move mov) {
 		//Space is taken
-		if(mov.getEnd()) != Pieces.EMPTY) {
+		if(mov.getEnd().getColor() != Color.GRAY) {
 			return false;
 		}
-		if(Points.isValidSpace(mov.getStart().row, mov.getStart().column) && Points.isValidSpace(mov.getEnd().row, mov.getEnd().column) && !mov.getStart().equals(mov.getEnd())) {
+		if(Piece.isValidSpace(mov.getStart().row, mov.getStart().column) && Piece.isValidSpace(mov.getEnd().row, mov.getEnd().column) && !mov.getStart().equals(mov.getEnd())) {
 			//Checks for Diagonal moves
-			if(mov.getStart().adjacentLocations().contains(mov.getEnd())) {
+			if(mov.getStart().adjacentLocations.contains(new Piece.adjLoc(mov.getEnd().row, mov.getEnd().column))) {
 				return true;
 			}
 		}
 		return false;
 	}
 	
-	public static boolean isValidMove(Move mov) {
-		//Space is taken
-		if(mov.getEnd() != Pieces.EMPTY) {
-			return false;
-		}
-		if(Points.isValidSpace(mov.getStart().row, mov.getStart().column) && Points.isValidSpace(mov.getEnd().row, mov.getEnd().column) && !mov.getStart().equals(mov.getEnd())) {
-			//Checks for Diagonal moves
-			if(mov.getStart().adjacentLocations().contains(mov.getEnd())) {
-				return true;
-			}
-		}
-		return false;
-	}
+	
 	/* Gets all valid moves for a specific point.
 	 * Doesn't take into account the state of the entire board.
 	 * (e.g. If a capture is possible at another location on the board,
@@ -265,7 +258,7 @@ public class Board {
 			int rowWd = 0;
 			int colAdv = 0;
 			int colWd = 0;
-			if(Board.isValidMove(this, move)) {
+			if(isValidMove(move)) {
 				Piece advance;
 				Piece withdraw;
 				// Sets the locations of the pieces for an advance and a withdraw
@@ -382,7 +375,7 @@ public class Board {
 						int rowWd = 0;
 						int colAdv = 0;
 						int colWd = 0;
-						if(Board.isValidMove(this, move)) {
+						if(isValidMove(move)) {
 							Piece advance;
 							Piece withdraw;
 							switch(move.getDirection()) {
