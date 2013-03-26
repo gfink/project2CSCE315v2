@@ -17,7 +17,7 @@ public class Piece {
 	public int column;
 	public Color pieceColor;
 	ArrayList<adjLoc> adjacentLocations = new ArrayList<adjLoc>();
-	public Piece(int x, int y) {
+	public Piece(int x, int y, Color c) {
 		row = x;
 		column = y;
 		if(!isValidSpace()) {
@@ -32,13 +32,13 @@ public class Piece {
 	}
 	
 	public boolean isValidSpace() {
-		if(row < BoardManager.ROWS && row >= 0 && column < BoardManager.COLUMNS && column >= 0)
+		if(row < Board.ROWS && row >= 0 && column < Board.COLUMNS && column >= 0)
 			return true;
 		return false;
 	}
 	
 	public static boolean isValidSpace(int s_row, int s_column) {
-		if(s_row < BoardManager.ROWS && s_row >= 0 && s_column < BoardManager.COLUMNS && s_column >= 0)
+		if(s_row < Board.ROWS && s_row >= 0 && s_column < Board.COLUMNS && s_column >= 0)
 			return true;
 		return false;
 	}
@@ -64,7 +64,7 @@ public class Piece {
 			adjacentLocations.add(new adjLoc(row, column + 1));
 	}
 	
-	public boolean equals(Points a)
+	public boolean equals(Piece a)
 	{
 		if(a.row == row && a.column == column)
 			return true;
