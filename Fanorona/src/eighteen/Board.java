@@ -43,7 +43,9 @@ public class Board {
 		this(5,13);
 	}
 	
-	public Board(int rows, int columns) { 
+	public Board(int rows, int columns) {
+		//TODO: throw exceptions for bad number of rows or columns
+		//TODO: Change max moves
 		resetBoard(rows, columns);
 	}
 	
