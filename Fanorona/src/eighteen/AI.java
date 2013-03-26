@@ -1,6 +1,8 @@
 package eighteen;
 
-import eighteen.BoardManager.BadMoveException;
+import eighteen.Board.BadMoveException;
+
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,10 +10,10 @@ public class AI {
 	// Will need to implement Thread at some point in the future
 	
 	private Tree minMaxTree;
-	private Pieces myColor;
+	private Color myColor;
 	private int levels;
 	
-	public AI(Pieces color) {
+	public AI(Color color) {
 		minMaxTree = new Tree();
 		myColor = color;
 		levels = 1;
@@ -24,11 +26,11 @@ public class AI {
 	
 	public void addLevel(TreeNode node) throws BadMoveException {
 		if(!node.hasChildren()) {
-			Pieces color;
-			if(node.getMove().getColor() == Pieces.WHITE)
-				color = Pieces.BLACK;
+			Color color;
+			if(node.getMove().getColor() == Color.WHITE)
+				color = Color.BLACK;
 			else
-				color = Pieces.WHITE;
+				color = Color.WHITE;
 			List<Move> validMoves = node.board.getValidMoves(color);
 			for(Move move: validMoves) {
 				Board newBoard = BoardManager.move(node.board, move);

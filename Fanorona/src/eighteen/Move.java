@@ -1,18 +1,20 @@
 package eighteen;
 
-import eighteen.BoardManager.BadMoveException;
+import java.awt.Color;
+
+import eighteen.Board.BadMoveException;
 
 public class Move {
-	private Points start;
-	private Points end;
-	private Pieces color;
+	private Piece start;
+	private Piece end;
+	private Color color;
 	private Direction direction;
 	private boolean advancing;
 	private boolean attacking;
 	
 	public Move() {}
 	
-	public Move(Points start, Points end, Pieces color, boolean isAdvancing, boolean isAttacking) throws BadMoveException {
+	public Move(Piece start, Piece end, Color color, boolean isAdvancing, boolean isAttacking) throws BadMoveException {
 		this.start = start;
 		this.end = end;
 		this.color = color;
@@ -62,27 +64,27 @@ public class Move {
 		
 	}
 	
-	public void setStart(Points start) {
+	public void setStart(Piece start) {
 		this.start = start;
 	}
 	
-	public Points getStart() {
+	public Piece getStart() {
 		return start;
 	}
 	
-	public void setEnd(Points end) {
+	public void setEnd(Piece end) {
 		this.end = end;
 	}
 	
-	public Points getEnd() {
+	public Piece getEnd() {
 		return end;
 	}
 	
-	public void setColor(Pieces color) {
+	public void setColor(Color color) {
 		this.color = color;
 	}
 	
-	public Pieces getColor() {
+	public Color getColor() {
 		return color;
 	}
 	
