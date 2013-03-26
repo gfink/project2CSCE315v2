@@ -25,7 +25,7 @@ public class Move {
 	
 	public void updateDirection() throws BadMoveException {
 		if(start.equals(end)) {
-			throw new BoardManager.BadMoveException("Bad move initialized");
+			throw new Board.BadMoveException("Bad move initialized");
 		}
 		if(start.column == end.column) {
 			if(start.row > end.row) {

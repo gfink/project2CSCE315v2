@@ -33,7 +33,7 @@ public class AI {
 				color = Color.WHITE;
 			List<Move> validMoves = node.board.getValidMoves(color);
 			for(Move move: validMoves) {
-				Board newBoard = BoardManager.move(node.board, move);
+				Board newBoard = Board.move(node.board, move);
 				TreeNode newChild = new TreeNode(move, newBoard);
 				node.addChild(newChild);
 			}

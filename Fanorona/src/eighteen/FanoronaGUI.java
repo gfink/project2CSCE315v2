@@ -12,7 +12,7 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-import eighteen.BoardManager.BadMoveException;
+import eighteen.Board.BadMoveException;
 
 public class FanoronaGUI extends JFrame {
 	//TODO if choice between pieces, pick attacking or retreating
@@ -22,7 +22,7 @@ public class FanoronaGUI extends JFrame {
 	//TODO show how many moves have been made
 	//TODO show the utility value of the board (for the user)
 	JButton helpb; //TODO add to a tool bar
-	BoardManager boardMan;
+	Board board;
 	DrawnPiece[][] gamePieces;
 	Container game = getContentPane();
 	PieceListener clicked;
@@ -36,12 +36,12 @@ public class FanoronaGUI extends JFrame {
     public void makePieces()
     {
     	JPanel board = new JPanel();
-    	board.setLayout(new GridLayout(boardMan.ROWS,boardMan.COLUMNS,15,15));
-        for(int x= 0;x<boardMan.ROWS;x++)
+    	board.setLayout(new GridLayout(board.ROWS,board.COLUMNS,15,15));
+        for(int x= 0;x<board.ROWS;x++)
         {
-        	for(int y = 0; y<boardMan.COLUMNS; y++)
+        	for(int y = 0; y<board.COLUMNS; y++)
         	{
-        		if(boardMan.board.get(x,y) == Pieces.BLACK)
+        		if(board.board.get(x,y) == Pieces.BLACK)
         		{
         			gamePieces[x][y] = new DrawnPiece(Pieces.BLACK,x,y);
         			gamePieces[x][y].setBackground(Color.BLACK);
@@ -90,8 +90,8 @@ public class FanoronaGUI extends JFrame {
     }
     public FanoronaGUI() {
     	game.setLayout(new BorderLayout());
-    	gamePieces = new DrawnPiece[BoardManager.ROWS][BoardManager.COLUMNS];
-    	boardMan = new BoardManager();
+    	gamePieces = new DrawnPiece[Board.ROWS][Board.COLUMNS];
+    	board = new Board();
     	prevMove = new DrawnPiece(Pieces.EMPTY,0,0);
     	
     	makePieces();
