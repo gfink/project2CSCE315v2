@@ -6,14 +6,14 @@ import eighteen.Board.BadMoveException;
 
 public class Move {
 	private Piece start;
-	private Piece end;
+	private Piece.adjLoc end;
 	private Direction direction;
 	private boolean advancing;
 	private boolean attacking;
 	
 	public Move() {}
 	
-	public Move(Piece start, Piece end, boolean isAdvancing, boolean isAttacking) throws BadMoveException {
+	public Move(Piece start, Piece.adjLoc end, boolean isAdvancing, boolean isAttacking) throws BadMoveException {
 		this.start = start;
 		this.end = end;
 		advancing = isAdvancing;
@@ -22,7 +22,7 @@ public class Move {
 	}
 	
 	public void updateDirection() throws BadMoveException {
-		if(start.equals(end)) {
+		if(start.row == end.row && start.column == end.column) {
 			throw new Board.BadMoveException("Bad move initialized");
 		}
 		if(start.column == end.column) {
@@ -70,11 +70,11 @@ public class Move {
 		return start;
 	}
 	
-	public void setEnd(Piece end) {
+	public void setEnd(Piece.adjLoc end) {
 		this.end = end;
 	}
 	
-	public Piece getEnd() {
+	public Piece.adjLoc getEnd() {
 		return end;
 	}
 	

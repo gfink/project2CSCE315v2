@@ -238,19 +238,19 @@ public class Board {
 	 * (e.g. If a capture is possible at another location on the board,
 	 *       this can still return a paika move)
 	 */
-	public List<Move> getValidMoves(x,y) throws BadMoveException {
+	public List<Move> getValidMoves(int x, int y) throws BadMoveException {
 		ArrayList<Move> capture = new ArrayList<Move>();
 		ArrayList<Move> paika = new ArrayList<Move>();
-		Piece piece = get(x,y);
+		Piece start = getPiece(x,y);
 		
 		// In case the point doesn't have a piece there
-		if(piece.isEmpty())
+		if(start.isEmpty())
 			return capture;
 		
 		// Local move to get the direction of each potential move
 		Move move = new Move();
 		move.setStart(start);
-		for(Piece end: start.adjacentLocations()) {
+		for(Piece.adjLoc end: start.adjacentLocations) {
 			// Updates the direction
 			move.setEnd(end);
 			move.updateDirection();
@@ -358,17 +358,14 @@ public class Board {
 	public List<Move> getValidMoves(Color color) throws BadMoveException {
 		ArrayList<Move> capture = new ArrayList<Move>();
 		ArrayList<Move> paika = new ArrayList<Move>();
-		Piece curLocation = new Piece(0,0);
 		
 		for(int x=0; x < Board.ROWS; x++) {
 			for(int y=0; y < Board.COLUMNS; y++) {
-				curLocation.row = x;
-				curLocation.column = y;
+				Piece piece = getPiece(x, y);
 				Move move = new Move();
-				if(get(curLocation) == color) {
-					move.setStart(curLocation);
-					move.setColor(color);
-					for(Piece end: curLocation.adjacentLocations()) {
+				if(piece.getColor() == color) {
+					move.setStart(piece);
+					for(Piece.adjLoc end: piece.adjacentLocations) {
 						move.setEnd(end);
 						move.updateDirection();
 						int rowAdv = 0;
@@ -428,34 +425,34 @@ public class Board {
 								colWd = -1;
 								break;
 							}
-							if(Piece.isValidSpace(curLocation.row + rowAdv, curLocation.column + colAdv) && Piece.isValidSpace(curLocation.row + rowWd, curLocation.column + colWd)) {
-								advance = theBoard[curLocation.row + rowAdv][curLocation.column + colAdv];
-								withdraw = theBoard[curLocation.row + rowWd][curLocation.column + colWd];
+							if(Piece.isValidSpace(piece.row + rowAdv, piece.column + colAdv) && Piece.isValidSpace(piece.row + rowWd, piece.column + colWd)) {
+								advance = theBoard[piece.row + rowAdv][piece.column + colAdv];
+								withdraw = theBoard[piece.row + rowWd][piece.column + colWd];
 								if(advance.getColor() != move.getColor() && !advance.isEmpty()) {
-									Move newMove = new Move(curLocation, end, true, true);
+									Move newMove = new Move(piece, end, true, true);
 									capture.add(newMove);
 								}
 								if(withdraw.getColor() != move.getColor() && !withdraw.isEmpty()) {
-									Move newMove = new Move(curLocation, end, false, true);
+									Move newMove = new Move(piece, end, false, true);
 									capture.add(newMove);
 								}
 							}
-							else if(Piece.isValidSpace(curLocation.row + rowAdv, curLocation.column + colAdv)) {
-								advance = theBoard[curLocation.row + rowAdv][curLocation.column + colAdv];
+							else if(Piece.isValidSpace(piece.row + rowAdv, piece.column + colAdv)) {
+								advance = theBoard[piece.row + rowAdv][piece.column + colAdv];
 								if(advance.getColor() != move.getColor() && !advance.isEmpty()) {
-									Move newMove = new Move(curLocation, end, false, true);
+									Move newMove = new Move(piece, end, false, true);
 									capture.add(newMove);
 								}
 							}
-							else if(Piece.isValidSpace(curLocation.row + rowWd, curLocation.column + colWd)) {
-								withdraw = theBoard[curLocation.row + rowWd][curLocation.column + colWd];
+							else if(Piece.isValidSpace(piece.row + rowWd, piece.column + colWd)) {
+								withdraw = theBoard[piece.row + rowWd][piece.column + colWd];
 								if(withdraw.getColor() != move.getColor() && !withdraw.isEmpty()) {
-									Move newMove = new Move(curLocation, end, true, true);
+									Move newMove = new Move(piece, end, true, true);
 									capture.add(newMove);
 								}
 							}
 							else if(capture.isEmpty()) {
-									Move newMove = new Move(curLocation, end, false, false);
+									Move newMove = new Move(piece, end, false, false);
 									paika.add(newMove);
 							}
 						}

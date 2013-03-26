@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TreeNode {
-	private Move move;
 	private List<TreeNode> children;
 	private TreeNode parent;
 	Board board;
@@ -19,31 +18,25 @@ public class TreeNode {
 	}
 	
 	public TreeNode(TreeNode node) {
-		this.move = node.move;
 		this.children = node.children;
 		this.parent = node.parent;
-		this.board = node.board;
+		this.board = new Board(node.board);
 		this.value = node.value;
 		this.traversalValue = node.traversalValue;
 	}
 	
-	public TreeNode(Move move, Board board) {
+	public TreeNode(Board board) {
 		this();
-		setMove(move);
 		setBoard(board);
 		value = board.Utility();
 	}
 	
-	public void setMove(Move move) {
-		this.move = move;
-	}
-	
-	public Move getMove() {
-		return move;
+	public ArrayList<Move> getMove() {
+		return board.chainMoves;
 	}
 	
 	public void setBoard(Board board) {
-		this.board = board;
+		this.board = new Board(board);
 	}
 	
 	public void addChild(TreeNode child) {
