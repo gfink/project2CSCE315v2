@@ -7,8 +7,8 @@ public class TreeNode {
 	private List<TreeNode> children;
 	private TreeNode parent;
 	Board board;
-	int value;
-	int traversalValue;
+	double value;
+	double traversalValue;
 
 	public TreeNode() {
 		children = new ArrayList<TreeNode>();
