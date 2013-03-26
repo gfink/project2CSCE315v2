@@ -236,15 +236,14 @@ public class Board {
 		if(getPiece(mov.getEnd().row, mov.getEnd().column).getColor() != Color.GRAY) {
 			return false;
 		}
-		if(Piece.isValidSpace(mov.getStart().row, mov.getStart().column) && Piece.isValidSpace(mov.getEnd().row, mov.getEnd().column) && !mov.getStart().equals(mov.getEnd())) {
+		if(Piece.isValidSpace(mov.getStart().row, mov.getStart().column) && !mov.getStart().equals(mov.getEnd())) {
 			//Checks for Diagonal moves
-			if(mov.getStart().adjacentLocations.contains(new Piece.adjLoc(mov.getEnd().row, mov.getEnd().column))) {
+			if(mov.getStart().adjacentLocations.contains(mov.getEnd())) {
 				return true;
 			}
 		}
 		return false;
 	}
-	
 	
 	/* Gets all valid moves for a specific point.
 	 * Doesn't take into account the state of the entire board.
