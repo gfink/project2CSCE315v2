@@ -9,7 +9,7 @@ public class DrawnPiece extends JButton{
 	public int yLoc;
 	public Color pColor;
 	Shape shape;
-	public DrawnPiece(Color c, int x, int y)
+	public DrawnPiece(int x, int y,Color c)
 	{
 		
 		super();

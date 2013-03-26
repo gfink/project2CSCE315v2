@@ -13,6 +13,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 import eighteen.Board.BadMoveException;
+import eighteen.Piece.adjLoc;
 
 public class FanoronaGUI extends JFrame {
 	//TODO if choice between pieces, pick attacking or retreating
@@ -35,31 +36,31 @@ public class FanoronaGUI extends JFrame {
     }
     public void makePieces()
     {
-    	JPanel board = new JPanel();
-    	board.setLayout(new GridLayout(board.ROWS,board.COLUMNS,15,15));
+    	JPanel jBoard = new JPanel();
+    	jBoard.setLayout(new GridLayout(board.ROWS,board.COLUMNS,15,15));
         for(int x= 0;x<board.ROWS;x++)
         {
         	for(int y = 0; y<board.COLUMNS; y++)
         	{
-        		if(board.board.get(x,y) == Pieces.BLACK)
+        		if(board.theBoard[x][y].getColor() == Color.BLACK)
         		{
-        			gamePieces[x][y] = new DrawnPiece(Pieces.BLACK,x,y);
+        			gamePieces[x][y] = new DrawnPiece(x,y,Color.BLACK);
         			gamePieces[x][y].setBackground(Color.BLACK);
         		}
-        		else if(boardMan.board.get(x,y) == Pieces.WHITE)
+        		else if(board.theBoard[x][y].getColor() == Color.WHITE)
         		{
-        			gamePieces[x][y] = new DrawnPiece(Pieces.WHITE,x,y);
+        			gamePieces[x][y] = new DrawnPiece(x,y,Color.WHITE);
         			gamePieces[x][y].setBackground(Color.WHITE);
         		}
         		else
         		{
-        			gamePieces[x][y] = new DrawnPiece(Pieces.EMPTY,x,y);
+        			gamePieces[x][y] = new DrawnPiece(x,y,Color.GRAY);
         			gamePieces[x][y].setBackground(Color.GRAY);
         		}
-        		board.add(gamePieces[x][y]);
+        		jBoard.add(gamePieces[x][y]);
         	}
         }
-        game.add(board,BorderLayout.CENTER);
+        game.add(jBoard,BorderLayout.CENTER);
     }
     public void makeHelpButton()
     {
@@ -76,9 +77,9 @@ public class FanoronaGUI extends JFrame {
     public void makePieceListeners()
     {
     	clicked = new PieceListener(); 
-		for(int x= 0;x<boardMan.ROWS;x++)
+		for(int x= 0;x<board.ROWS;x++)
         {
-        	for(int y = 0; y<boardMan.COLUMNS; y++)
+        	for(int y = 0; y<board.COLUMNS; y++)
         	{
 			gamePieces[x][y].addActionListener(clicked);
         	}
@@ -90,9 +91,9 @@ public class FanoronaGUI extends JFrame {
     }
     public FanoronaGUI() {
     	game.setLayout(new BorderLayout());
+    	board = new Board(5,13);
     	gamePieces = new DrawnPiece[Board.ROWS][Board.COLUMNS];
-    	board = new Board();
-    	prevMove = new DrawnPiece(Pieces.EMPTY,0,0);
+    	prevMove = new DrawnPiece(0,0,Color.GRAY);
     	
     	makePieces();
     	//makeBoard();
@@ -115,9 +116,9 @@ public class FanoronaGUI extends JFrame {
     	 */
     	public void actionPerformed(ActionEvent e)
     	{
+    		//needs to call some sort of isValidMove function before trying to run the move
     		DrawnPiece gamePiece = (DrawnPiece) e.getSource();
-    		Points pointsClicked = new Points(gamePiece.xLoc, gamePiece.yLoc);
-    		ArrayList<Points> adjLocs = pointsClicked.adjacentLocations();
+    		Piece pointsClicked = board.theBoard[gamePiece.xLoc][gamePiece.yLoc];
     		//first check if the piece clicked is an available piece
     		if (gamePiece.pColor == Color.YELLOW)//already selected
     		{
@@ -133,7 +134,7 @@ public class FanoronaGUI extends JFrame {
     		else
     		{
     			//highlight all available moves, if not making a move, and if the piece clicked isn't gray
-	    		for(Points p : adjLocs)
+	    		for(adjLoc p : pointsClicked.adjacentLocations)
 	    		{
 	    			if (gamePieces[p.row][p.column].pColor == Color.GRAY)
 	    			{
