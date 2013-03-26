@@ -12,14 +12,19 @@ public class Piece {
 			column = y;
 		}
 	}
-	
+	private enum PieceState{
+		BLACK,WHITE,EMPTY
+	}
 	public int row;
 	public int column;
-	public Color pieceColor;
+	private boolean isEmpty;
+	private Color pieceColor;
+	private PieceState pState;
 	ArrayList<adjLoc> adjacentLocations = new ArrayList<adjLoc>();
 	public Piece(int x, int y, Color c) {
 		row = x;
 		column = y;
+		pState=PieceState.EMPTY;
 		if(!isValidSpace()) {
 			throw new IndexOutOfBoundsException();
 		}
@@ -30,7 +35,53 @@ public class Piece {
 		this.row = a.row;
 		this.column = a.column;
 	}
-	
+	public void setColor(Color c)
+	{
+		pieceColor=c;
+		if(c == Color.BLACK)
+		{
+			pState=PieceState.BLACK;
+		}
+		else if(c == Color.WHITE)
+		{
+			pState=PieceState.WHITE;
+		}
+		else if(c == Color.GRAY)
+		{
+			pState=PieceState.EMPTY;
+			isEmpty=true;
+		}
+		else
+		{
+			//set some color like yellow or something, leaving this else here anyway
+		}
+		
+	}
+	public Color getColor()
+	{
+		return pieceColor;
+	}
+	public Color getPieceState()
+	{
+		Color c;
+		if(pState==PieceState.BLACK)
+		{
+			c=Color.BLACK;
+		}
+		else if(pState==PieceState.WHITE)
+		{
+			c=Color.WHITE;
+		}
+		else//is empty
+		{
+			c=Color.GRAY;
+		}
+		return c;
+	}
+	public boolean isEmpty()
+	{
+		return isEmpty;
+	}
 	public boolean isValidSpace() {
 		if(row < Board.ROWS && row >= 0 && column < Board.COLUMNS && column >= 0)
 			return true;
