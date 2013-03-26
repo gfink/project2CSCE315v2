@@ -7,17 +7,15 @@ import eighteen.Board.BadMoveException;
 public class Move {
 	private Piece start;
 	private Piece end;
-	private Color color;
 	private Direction direction;
 	private boolean advancing;
 	private boolean attacking;
 	
 	public Move() {}
 	
-	public Move(Piece start, Piece end, Color color, boolean isAdvancing, boolean isAttacking) throws BadMoveException {
+	public Move(Piece start, Piece end, boolean isAdvancing, boolean isAttacking) throws BadMoveException {
 		this.start = start;
 		this.end = end;
-		this.color = color;
 		advancing = isAdvancing;
 		attacking = isAttacking;
 		updateDirection();
@@ -80,14 +78,9 @@ public class Move {
 		return end;
 	}
 	
-	public void setColor(Color color) {
-		this.color = color;
-	}
-	
 	public Color getColor() {
-		return color;
+		return start.getColor();
 	}
-	
 	public Direction getDirection() {
 		return direction;
 	}

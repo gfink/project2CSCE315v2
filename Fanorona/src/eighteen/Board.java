@@ -11,6 +11,13 @@ public class Board {
 			super(message);
 		}
 	}
+	
+	public static class BadBoardException extends Exception {
+		public BadBoardException() {
+			super("Board doesn't have allowable number of rows or columns");
+		}
+	}
+	
 	Piece[][] theBoard;
 	int blacks;
 	int whites;
@@ -20,40 +27,58 @@ public class Board {
 	Piece previousSpot;
 	Direction previousDirection;
 	ArrayList<Piece> previousLocations;
+	ArrayList<Move> chainMoves;
 	
-	public static final int ROWS = 13;
-	public static final int COLUMNS = 13;
+	public static int ROWS;
+	public static int COLUMNS;
 	
-	public Board()
+	public Board(int rows, int columns)
 	{ 
+		ROWS = rows;
+		COLUMNS = columns;
 		theBoard = new Piece[ROWS][COLUMNS];
 		for(int i = 0; i < ROWS; i++) {
 			for(int j = 0; j < COLUMNS; j++) {
-				if(i < ROWS/2) {
-					theBoard[i][j].setColor(Color.BLACK);
+				//The middle row
+				if(i == (ROWS/2) + 1) {
+					if(j == (COLUMNS/2) + 1) {
+						theBoard[i][j] = new Piece(i, j, Color.GRAY);
+					}
+					else if(j % 2 == 0) {
+						theBoard[i][j] = new Piece(i, j, Color.WHITE);
+					}
+					else {
+						theBoard[i][j] = new Piece(i, j, Color.BLACK);
+					}
+				}
+				else if(i < ROWS/2) {
+					theBoard[i][j] = new Piece(i, j, Color.BLACK);
 				}
 				else {
-					theBoard[i][j].setColor(Color.WHITE);
+					theBoard[i][j] = new Piece(i, j, Color.WHITE);
 				}
 			}
 		}
-		theBoard[ROWS/2][0].setColor(Color.BLACK);
-		theBoard[ROWS/2][1].setColor(Color.WHITE);
-		theBoard[ROWS/2][2].setColor(Color.BLACK);
-		theBoard[ROWS/2][3].setColor(Color.WHITE);
-		theBoard[ROWS/2][4].setColor(Color.GRAY);
-		theBoard[ROWS/2][5].setColor(Color.BLACK);
-		theBoard[ROWS/2][6].setColor(Color.WHITE);
-		theBoard[ROWS/2][7].setColor(Color.BLACK);
-		theBoard[ROWS/2][8].setColor(Color.WHITE);
-		whites = 22;
-		blacks = 22;
+		whites = (rows * columns) / 2;
+		blacks = whites;
+		//chainMoves
 	}
 	
 	public Board(Board b) {
-		theBoard = b.theBoard;
+		ROWS = b.ROWS;
+		COLUMNS = b.COLUMNS;
+		theBoard = new Piece[b.ROWS][b.COLUMNS];
+		for(int i = 0; i < ROWS; i++) {
+			System.arraycopy(b.theBoard, 0, theBoard, 0, COLUMNS);
+		}
 		blacks = b.blacks;
 		whites = b.whites;
+		moves = b.moves;
+		chain = b.chain;
+		chainColor = b.chainColor;
+		previousSpot = b.previousSpot;
+		previousDirection = b.previousDirection;
+		previousLocations = new ArrayList<Piece>(b.previousLocations);
 	}
 	
 	public Piece getPiece(int x, int y) {
@@ -67,7 +92,7 @@ public class Board {
 		return whites - blacks;
 	}
 	private void resetBoard() {
-		Board board = new Board();
+		Board board = new Board(ROWS, COLUMNS);
 		moves = 0;
 		
 		chain = false;
@@ -81,18 +106,19 @@ public class Board {
 	}
 	
 	//Returns whether the game is over
-	public boolean move(Move mov) throws BadMoveException {
+	public ArrayList<Piece> move(Move mov) throws BadMoveException {
 		if(!isValidMove(mov)) {
 			throw new BadMoveException("Bad move at [" + mov.getStart().row + ", " + mov.getStart().column + "] to [" + mov.getEnd().row + ", " + mov.getEnd().column + "]");
 		}
 		
 		boolean isChain = true;
 		
+		//Checks for errors in chaining
 		if(chain) {
 			if(mov.getStart().getColor() != chainColor) {
 				isChain = false;
 				previousLocations = new ArrayList<Piece>();
-				chainColor = get(mov.getStart());
+				chainColor = mov.getStart().getColor();
 			}
 			else if(mov.getStart() != previousSpot) {
 				throw new BadMoveException("Bad move at [" + mov.getStart().row + ", " + mov.getStart().column + "] -> Wrong starting spot");
@@ -106,9 +132,9 @@ public class Board {
 		}
 		chain = isChain;
 		
-		
-		board.set(mov.getEnd(), board.get(mov.getStart()));
-		board.set(mov.getStart(), Pieces.EMPTY);
+		//Move the actual piece
+		theBoard[mov.getEnd().row][mov.getEnd().column].setColor(mov.getStart().getColor());
+		theBoard[mov.getStart().row][mov.getStart().column].setColor(Color.GRAY);
 		
 		int iterateVertical = 0;
 		int iterateHorizontal = 0;
@@ -147,55 +173,44 @@ public class Board {
 			iterateHorizontal *= -1;
 		}
 		
-		Points nextPoint;
+		//Keeps track of which piece we are looking at
+		int nextRow;
+		int nextColumn;
 		if(mov.getAdvancing()) {
-			nextPoint = new Points(mov.getEnd());
+			nextRow = mov.getEnd().row;
+			nextColumn = mov.getEnd().column;
 		}
 		else {
-			nextPoint = new Points(mov.getStart());
+			nextRow = mov.getStart().row;
+			nextColumn = mov.getStart().column;
 		}
+		
+		ArrayList<Piece> ret = new ArrayList<Piece>();
 		
 		try {
 			while(true) {
-				nextPoint = new Points(nextPoint.row + iterateHorizontal, nextPoint.column + iterateVertical);
-				if(board.get(nextPoint) == chainColor || board.get(nextPoint) == Pieces.EMPTY) {
+				nextRow += iterateHorizontal;
+				nextColumn += iterateVertical;
+				if(theBoard[nextRow][nextColumn].getColor() != oppositeColor(mov.getColor())) {
 					break;
 				}
-				board.set(nextPoint, Pieces.EMPTY);
-				if(chainColor == Pieces.WHITE) {
+				theBoard[nextRow][nextColumn].setColor(Color.GRAY);
+				if(chainColor == Color.WHITE) {
 					blacks--;
 				}
 				else {
 					whites--;
 				}
+				ret.add(theBoard[nextRow][nextColumn]);
 			}
 		}
 		finally {}
-		chainColor = board.get(mov.getEnd());
+		chainColor = mov.getColor();
 		previousSpot = mov.getStart();
 		previousDirection = mov.getDirection();
 		previousLocations.add(mov.getStart());
 		
-		if(!chain) {
-			moves++;
-		}
-		if(moves >= 50 || whites == 0 || blacks == 0) {
-			return true;
-		}
-		return false;
 		
-	}
-	
-	public static Board move(Board b, Move mov) throws BadMoveException {
-		if(!isValidMove(b, mov))
-			throw new BoardManager.BadMoveException("Bad move at [" + mov.getStart().row + ", " + mov.getStart().column + "] to [" + mov.getEnd().row + ", " + mov.getEnd().column + "]");
-		
-		Board ret = new Board(b);
-		
-		ret.set(mov.getEnd(), ret.get(mov.getStart()));
-		ret.set(mov.getStart(), Pieces.EMPTY);
-		
-		return ret;
 	}
 	
 	private boolean isValidMove(Move mov) {
@@ -459,5 +474,17 @@ public class Board {
 			return capture;
 		else
 			return paika;
+	}
+	
+	public static Color oppositeColor(Color color) {
+		if(color == Color.GRAY) {
+			return Color.GRAY;
+		}
+		else if(color == Color.WHITE) {
+			return Color.BLACK;
+		}
+		else {
+			return Color.WHITE;
+		}
 	}
 }
