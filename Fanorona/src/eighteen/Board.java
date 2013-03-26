@@ -111,7 +111,7 @@ public class Board {
 	}
 	
 	//Returns whether the game is over
-	public ArrayList<Piece> move(Move mov) throws BadMoveException {
+	public void move(Move mov) throws BadMoveException {
 		if(!isValidMove(mov)) {
 			throw new BadMoveException("Bad move at [" + mov.getStart().row + ", " + mov.getStart().column + "] to [" + mov.getEnd().row + ", " + mov.getEnd().column + "]");
 		}
@@ -220,18 +220,18 @@ public class Board {
 	
 	public boolean isValidMove(Move mov) {
 		//Space is taken
-		if(mov.getEnd().getColor() != Color.GRAY) {
+		Piece.adjLoc end = mov.getEnd();
+		if(getPiece(end.row, end.column).getColor() != Color.GRAY) {
 			return false;
 		}
-		if(Piece.isValidSpace(mov.getStart().row, mov.getStart().column) && Piece.isValidSpace(mov.getEnd().row, mov.getEnd().column) && !mov.getStart().equals(mov.getEnd())) {
+		if(Piece.isValidSpace(mov.getStart().row, mov.getStart().column) && !mov.getStart().equals(mov.getEnd())) {
 			//Checks for Diagonal moves
-			if(mov.getStart().adjacentLocations.contains(new Piece.adjLoc(mov.getEnd().row, mov.getEnd().column))) {
+			if(mov.getStart().adjacentLocations.contains(end)) {
 				return true;
 			}
 		}
 		return false;
 	}
-	
 	
 	/* Gets all valid moves for a specific point.
 	 * Doesn't take into account the state of the entire board.
