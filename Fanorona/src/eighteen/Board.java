@@ -132,12 +132,12 @@ public class Board {
 		if(chain) {
 			if(mov.getStart().getColor() != chainColor) {
 				isChain = false;
-				previousLocations = new ArrayList<Piece>();
+				previousLocations = new ArrayList<Piece.adjLoc>();
 				chainColor = mov.getStart().getColor();
 				chainMoves = new ArrayList<Move>();
 				moves++;
 			}
-			else if(mov.getStart() != previousSpot) {
+			else if(new Piece.adjLoc(mov.getStart()) != previousSpot) {
 				throw new BadMoveException("Bad move at [" + mov.getStart().row + ", " + mov.getStart().column + "] -> Wrong starting spot");
 			}
 			else if(previousLocations.contains(mov.getEnd())) {
@@ -223,15 +223,17 @@ public class Board {
 		}
 		finally {}
 		chainColor = mov.getColor();
-		previousSpot = mov.getStart();
+		previousSpot = new Piece.adjLoc(mov.getStart());
 		previousDirection = mov.getDirection();
-		previousLocations.add(mov.getStart());
+		previousLocations.add(new Piece.adjLoc(mov.getStart()));
 		chainMoves.add(mov);
+		
+		return ret;
 	}
 	
 	public boolean isValidMove(Move mov) {
 		//Space is taken
-		if(mov.getEnd().getColor() != Color.GRAY) {
+		if(getPiece(mov.getEnd().row, mov.getEnd().column).getColor() != Color.GRAY) {
 			return false;
 		}
 		if(Piece.isValidSpace(mov.getStart().row, mov.getStart().column) && Piece.isValidSpace(mov.getEnd().row, mov.getEnd().column) && !mov.getStart().equals(mov.getEnd())) {
