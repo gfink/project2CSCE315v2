@@ -44,7 +44,7 @@ public class AI {
 		TreeNode root = minMaxTree.getRoot();
 		if(!root.hasChildren())
 			getNewLevel();
-		int value;
+		double value;
 		if (root.getMove().get(0).getColor() != myColor)
 			value = maxValue(root, -999999, 999999);
 		else
@@ -56,7 +56,7 @@ public class AI {
 		return new ArrayList<Move>();
 	}
 	
-	private int maxValue(TreeNode state, int alpha, int beta) {
+	private double maxValue(TreeNode state, double alpha, double beta) {
 		if(!state.hasChildren())
 			return state.value;
 		
@@ -70,7 +70,7 @@ public class AI {
 		return alpha;
 	}
 	
-	private int minValue(TreeNode state, int alpha, int beta) {
+	private double minValue(TreeNode state, double alpha, double beta) {
 		if(!state.hasChildren())
 			return state.value;
 		
