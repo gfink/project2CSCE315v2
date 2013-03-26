@@ -3,13 +3,16 @@ import java.awt.Color;
 import java.util.ArrayList;
 
 public class Piece {
-	public class adjLoc{//adjacent location
+	public static class adjLoc{//adjacent location
 		int row;
 		int column;
-		public adjLoc(int x, int y)
-		{
+		public adjLoc(int x, int y) {
 			row = x;
 			column = y;
+		}
+		public adjLoc(Piece piece) {
+			row = piece.row;
+			column = piece.column;
 		}
 	}
 	private enum PieceState{

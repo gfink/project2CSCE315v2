@@ -19,14 +19,21 @@ public class Board {
 	}
 	
 	Piece[][] theBoard;
+	
+	//The number of whites and blacks
 	int blacks;
 	int whites;
+	
+	//The number of moves made to reach this point
 	int moves;
+	//Whether or not a chain is active
 	boolean chain;
 	Color chainColor;
-	Piece previousSpot;
+	Piece.adjLoc previousSpot;
 	Direction previousDirection;
-	ArrayList<Piece> previousLocations;
+	//The previous spots moved to in this chain
+	ArrayList<Piece.adjLoc> previousLocations;
+	//The moves in this chain
 	ArrayList<Move> chainMoves;
 	
 	public static int ROWS;
@@ -36,16 +43,50 @@ public class Board {
 		this(5,13);
 	}
 	
-	public Board(int rows, int columns)
-	{ 
+	public Board(int rows, int columns) { 
+		resetBoard(rows, columns);
+	}
+	
+	public Board(Board b) {
+		ROWS = b.ROWS;
+		COLUMNS = b.COLUMNS;
+		theBoard = new Piece[b.ROWS][b.COLUMNS];
+		for(int i = 0; i < ROWS; i++) {
+			System.arraycopy(b.theBoard, 0, theBoard, 0, COLUMNS);
+		}
+		blacks = b.blacks;
+		whites = b.whites;
+		moves = b.moves;
+		chain = b.chain;
+		chainColor = b.chainColor;
+		previousSpot = b.previousSpot;
+		previousDirection = b.previousDirection;
+		previousLocations = new ArrayList<Piece.adjLoc>(b.previousLocations);
+		chainMoves = new ArrayList<Move>(b.chainMoves);
+	}
+	
+	public Piece getPiece(int x, int y) {
+		return theBoard[x][y];
+	}
+	//public void setPieceColor(int x, int y, Color color) {
+	//	(theBoard[x][y]).setColor(color);
+	//}
+	
+	public double Utility() {
+		double ret = whites / (blacks + whites);
+		ret *= 200;
+		ret -= 100;
+		return ret;
+	}
+	private void resetBoard(int rows, int columns) {
 		ROWS = rows;
 		COLUMNS = columns;
 		theBoard = new Piece[ROWS][COLUMNS];
 		for(int i = 0; i < ROWS; i++) {
 			for(int j = 0; j < COLUMNS; j++) {
 				//The middle row
-				if(i == (ROWS/2) + 1) {
-					if(j == (COLUMNS/2) + 1) {
+				if(i == ROWS/2) {
+					if(j == COLUMNS/2) {
 						theBoard[i][j] = new Piece(i, j, Color.GRAY);
 					}
 					else if(j % 2 == 0) {
@@ -63,55 +104,24 @@ public class Board {
 				}
 			}
 		}
-		whites = (rows * columns) / 2;
-		blacks = whites;
-		chainMoves = new ArrayList<Move>();
-	}
-	
-	public Board(Board b) {
-		ROWS = b.ROWS;
-		COLUMNS = b.COLUMNS;
-		theBoard = new Piece[b.ROWS][b.COLUMNS];
-		for(int i = 0; i < ROWS; i++) {
-			System.arraycopy(b.theBoard, 0, theBoard, 0, COLUMNS);
-		}
-		blacks = b.blacks;
-		whites = b.whites;
-		moves = b.moves;
-		chain = b.chain;
-		chainColor = b.chainColor;
-		previousSpot = b.previousSpot;
-		previousDirection = b.previousDirection;
-		previousLocations = new ArrayList<Piece>(b.previousLocations);
-		chainMoves = new ArrayList<Move>(b.chainMoves);
-	}
-	
-	public Piece getPiece(int x, int y) {
-		return theBoard[x][y];
-	}
-	//public void setPieceColor(int x, int y, Color color) {
-	//	(theBoard[x][y]).setColor(color);
-	//}
-	
-	public int Utility() {
-		return whites - blacks;
-	}
-	private void resetBoard() {
-		Board board = new Board(ROWS, COLUMNS);
 		moves = 0;
-		
 		chain = false;
 		//The first mover is white
 		chainColor = Color.WHITE;
 		//0,0 will never be a problem for a first move in the middle, which will reset it
-		previousSpot = new Piece(0,0,Color.GRAY);
+		previousSpot = new Piece.adjLoc(0, 0);
 		//As white moves first, this will be reset and not be a problem
 		previousDirection = Direction.LEFT;
-		previousLocations = new ArrayList<Piece>();
+		previousLocations = new ArrayList<Piece.adjLoc>();
+		whites = (rows * columns) / 2;
+		blacks = whites;
+		//Thus the first move call will increment moves to 1
+		chainColor = Color.BLACK;
+		chainMoves = new ArrayList<Move>();
 	}
 	
 	//Returns whether the game is over
-	public void move(Move mov) throws BadMoveException {
+	public ArrayList<Piece> move(Move mov) throws BadMoveException {
 		if(!isValidMove(mov)) {
 			throw new BadMoveException("Bad move at [" + mov.getStart().row + ", " + mov.getStart().column + "] to [" + mov.getEnd().row + ", " + mov.getEnd().column + "]");
 		}
@@ -122,11 +132,12 @@ public class Board {
 		if(chain) {
 			if(mov.getStart().getColor() != chainColor) {
 				isChain = false;
-				previousLocations = new ArrayList<Piece>();
+				previousLocations = new ArrayList<Piece.adjLoc>();
 				chainColor = mov.getStart().getColor();
 				chainMoves = new ArrayList<Move>();
+				moves++;
 			}
-			else if(mov.getStart() != previousSpot) {
+			else if(new Piece.adjLoc(mov.getStart()) != previousSpot) {
 				throw new BadMoveException("Bad move at [" + mov.getStart().row + ", " + mov.getStart().column + "] -> Wrong starting spot");
 			}
 			else if(previousLocations.contains(mov.getEnd())) {
@@ -212,21 +223,22 @@ public class Board {
 		}
 		finally {}
 		chainColor = mov.getColor();
-		previousSpot = mov.getStart();
+		previousSpot = new Piece.adjLoc(mov.getStart());
 		previousDirection = mov.getDirection();
-		previousLocations.add(mov.getStart());
+		previousLocations.add(new Piece.adjLoc(mov.getStart()));
 		chainMoves.add(mov);
+		
+		return ret;
 	}
 	
 	public boolean isValidMove(Move mov) {
 		//Space is taken
-		Piece.adjLoc end = mov.getEnd();
-		if(getPiece(end.row, end.column).getColor() != Color.GRAY) {
+		if(getPiece(mov.getEnd().row, mov.getEnd().column).getColor() != Color.GRAY) {
 			return false;
 		}
 		if(Piece.isValidSpace(mov.getStart().row, mov.getStart().column) && !mov.getStart().equals(mov.getEnd())) {
 			//Checks for Diagonal moves
-			if(mov.getStart().adjacentLocations.contains(end)) {
+			if(mov.getStart().adjacentLocations.contains(mov.getEnd())) {
 				return true;
 			}
 		}
