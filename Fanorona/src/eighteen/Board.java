@@ -48,6 +48,8 @@ public class Board {
 	//The moves in this chain
 	ArrayList<Move> chainMoves;
 	
+	Color turn;
+	
 	public static int ROWS;
 	public static int COLUMNS;
 	public static int MAXMOVES;
@@ -74,6 +76,7 @@ public class Board {
 		previousDirection = b.previousDirection;
 		previousLocations = new ArrayList<Piece.adjLoc>(b.previousLocations);
 		chainMoves = new ArrayList<Move>(b.chainMoves);
+		turn = b.turn;
 	}
 	
 	public Piece getPiece(int x, int y) {
@@ -130,6 +133,8 @@ public class Board {
 		//Thus the first move call will increment moves to 1
 		chainColor = Color.BLACK;
 		chainMoves = new ArrayList<Move>();
+		//White is the first to move
+		turn = Color.WHITE;
 	}
 	
 	//Returns whether the game is over
@@ -209,12 +214,14 @@ public class Board {
 		else {
 			nextRow = mov.getStart().row;
 			nextColumn = mov.getStart().column;
+			System.out.println("Got here");
 		}
 		
 		ArrayList<Piece> ret = new ArrayList<Piece>();
 		System.out.println("" + mov.getState() + " " + mov.getDirection());
 		try {
 			while(true) {
+				System.out.println("" + nextRow + ", " + nextColumn);
 				nextRow += iterateVertical;
 				nextColumn += iterateHorizontal;
 				System.out.println("" + nextRow + ", " + nextColumn);
@@ -224,7 +231,7 @@ public class Board {
 				}
 				if(theBoard[nextRow][nextColumn].getColor() != oppositeColor(mov.getColor())) {
 					System.out.println("Broke because the next isn't the opposite color");
-					System.out.println("Next is " + theBoard[nextRow][nextColumn].getColor());
+					System.out.println("At " + nextRow + " " + nextColumn);
 					System.out.println("This is " + mov.getColor());
 					break;
 				}
@@ -299,9 +306,17 @@ public class Board {
 					if(theBoard[previousSpace.row][previousSpace.column].getColor() == oppositeColor(mov.getColor())) {
 						return AttackState.BOTH;
 					}
+					else {
+						return AttackState.ADVANCING;
+					}
 				}
 				else {
 					return AttackState.ADVANCING;
+				}
+			}
+			else if(Piece.isValidSpace(previousSpace)) {
+				if(theBoard[previousSpace.row][previousSpace.column].getColor() == oppositeColor(mov.getColor())) {
+					return AttackState.WITHDRAWING;
 				}
 			}
 		}
