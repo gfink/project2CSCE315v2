@@ -161,7 +161,6 @@ public class FanoronaGUI extends JFrame {
     	try {
 			board = new Board(5,13);
 		} catch (BadBoardException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}//TODO eventually need user input here
     	gamePieces = new DrawnPiece[Board.ROWS][Board.COLUMNS];
@@ -182,8 +181,16 @@ public class FanoronaGUI extends JFrame {
     }
     class PieceListener implements ActionListener
     {
+    	public void runAIMove(Move mov)
+    	{
+    		//give ai/opponent move we ran
+    		//TODO ask for ai/opponent move
+    		//draw ai/opponent move
+    	}
     	public void actionPerformed(ActionEvent e)
     	{
+    		//TODO check if chain
+    		//TODO prevent turn if not correct player
     		DrawnPiece gamePiece = (DrawnPiece) e.getSource();
     		Piece pieceClicked = board.theBoard[gamePiece.xLoc][gamePiece.yLoc];
     		//first check if the piece clicked is an available piece
@@ -193,8 +200,13 @@ public class FanoronaGUI extends JFrame {
     			{
 	    			Move moveToPlay = null;
 					moveToPlay = new Move(prevMove, new Piece.adjLoc(pieceClicked), AttackState.NIETHER);
-					//now constructed, check move if attacking or withdrawing
+					moveToPlay.state = board.isAdvancing(moveToPlay);//now constructed, check move if attacking or withdrawing
 					//prompt user if needed
+					if (moveToPlay.state == AttackState.BOTH)
+					{
+						//TODO ask user for one, right now just set to attacking
+						moveToPlay.state = AttackState.ADVANCING;
+					}
 					//then set the value externally
 	    			if (board.isValidMove(moveToPlay))
 	    			{
@@ -222,15 +234,13 @@ public class FanoronaGUI extends JFrame {
 		    					gamePieces[p.row][p.column].repaint();
 		    			}
 		    			
-		    	    	System.out.print("Moved to x:" + gamePiece.yLoc+" y:"+gamePiece.xLoc + " from x:" +prevMove.column +" y:"+prevMove.row +"\n" );
+		    	    	System.out.print("Moved to x:" + gamePiece.xLoc+" y:"+gamePiece.yLoc + " from x:" +prevMove.row +" y:"+prevMove.column +"\n" );
 		    	    	//set up for next turn
 		    	    	prevMoveDrawn = null;
 		    	    	prevMove = null;
 		    			isMoveState2 = false;
 		    			changeTurn();
-		    			//TODO check if game over by win
-		    			//TODO ask for ai/opponent move
-		    			//TODO check if game over by win or by too many moves
+		    			runAIMove(moveToPlay);
 		    			updateInfoPanel();
 	    			}
 				} 
@@ -239,8 +249,8 @@ public class FanoronaGUI extends JFrame {
 					//TODO something about the GameOverException
 				}
     			catch (GameOverException e2) {
-					e2.printStackTrace();
-					//TODO something about the GameOverException
+	    			//TODO check if game over by win
+	    			//TODO check if game over by win or by too many moves
 				}
     		}
     		else if (gamePiece.pColor !=Color.YELLOW && gamePiece.pColor != Color.GRAY && !isMoveState2)
@@ -265,9 +275,7 @@ public class FanoronaGUI extends JFrame {
 	    			isMoveState2 = true;
 	    		}
 	    		System.out.print("Clicked x:" + gamePiece.xLoc+" y:"+gamePiece.yLoc+"\n");
-    		}	
-    		//System.out.print("Clicked x:" + gamePiece.xLoc+" y:"+gamePiece.yLoc+"\n");
-    		//System.out.print(isMoveState2 +" \n");	
+    		}		
     	}
     }
     
