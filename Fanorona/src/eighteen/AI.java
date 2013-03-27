@@ -34,7 +34,6 @@ public class AI {
 				try {
 					tempBoard.move(move);
 				} catch (GameOverException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 				TreeNode newChild = new TreeNode(tempBoard);
