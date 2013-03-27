@@ -33,7 +33,8 @@ public class FanoronaGUI extends JFrame {
 	private String playerTurn = "WHITE";
 	Container game = getContentPane();
 	PieceListener clicked;//given to every piece in a loop
-	
+	AI opponent;
+	Color playerColor;
 	Boolean isMoveState2 = false;
     public static FanoronaGUI GUI;
     
@@ -204,6 +205,8 @@ public class FanoronaGUI extends JFrame {
 		} catch (BadBoardException e) {
 			e.printStackTrace();
 		}//TODO eventually need user input here
+    	opponent = new AI(Color.BLACK);//TODO eventually need user input here
+    	playerColor = Color.WHITE;
     	gamePieces = new DrawnPiece[Board.ROWS][Board.COLUMNS];
     	prevMoveDrawn = null;
     	userPickState = null;
@@ -227,9 +230,27 @@ public class FanoronaGUI extends JFrame {
     {
     	public void runAIMove(Move mov)
     	{
-    		//give ai/opponent move we ran
-    		//TODO ask for ai/opponent move
-    		//draw ai/opponent move
+    		try {
+	    		ArrayList<Move> AIMoves;
+	    		opponent.opponentMove(mov);
+	    		
+					AIMoves = opponent.alphaBetaSearch();
+				
+	    		for (Move m : AIMoves)
+	    		{
+					gamePieces[m.end.row][m.end.column].pColor = playerColor;
+					gamePieces[m.end.row][m.end.column].repaint();
+					//make the previous point turn gray
+					gamePieces[m.start.row][m.start.column].pColor = Color.GRAY;
+					gamePieces[m.start.row][m.start.column].repaint();
+		    		//give ai/opponent move we ran
+		    		//TODO ask for ai/opponent move
+		    		//draw ai/opponent move
+	    		}
+    		} catch (BadMoveException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
     	}
     	public void actionPerformed(ActionEvent e)
     	{
@@ -238,100 +259,108 @@ public class FanoronaGUI extends JFrame {
     		DrawnPiece gamePiece = (DrawnPiece) e.getSource();
     		Piece pieceClicked = board.theBoard[gamePiece.xLoc][gamePiece.yLoc];
     		//first check if the piece clicked is an available piece
-    		if (gamePiece.pColor == Color.YELLOW && isMoveState2)//already selected
+    		if (gamePiece.pColor == playerColor || gamePiece.pColor == Color.YELLOW)
     		{
-    			try
-    			{
-	    			Move moveToPlay = null;
-					moveToPlay = new Move(prevMove, new Piece.adjLoc(pieceClicked), AttackState.NIETHER);
-					moveToPlay.state = board.isAdvancing(moveToPlay);//now constructed, check move if attacking or withdrawing
-					//prompt user if needed
-					if (moveToPlay.state == AttackState.BOTH)
-					{
-						//TODO ask user for one, right now just set to attacking
-						moveToPlay.state = AttackState.ADVANCING;
+	    		if (gamePiece.pColor == Color.YELLOW && isMoveState2)//already selected
+	    		{
+	    			try
+	    			{
+		    			Move moveToPlay = null;
+						moveToPlay = new Move(prevMove, new Piece.adjLoc(pieceClicked), AttackState.NIETHER);
+						moveToPlay.state = board.isAdvancing(moveToPlay);//now constructed, check move if attacking or withdrawing
+						//prompt user if needed
+						if (moveToPlay.state == AttackState.BOTH)
+						{
+							//TODO ask user for one, right now just set to attacking
+							moveToPlay.state = AttackState.ADVANCING;
+						}
+						//then set the value externally
+		    			if (board.isValidMove(moveToPlay))
+		    			{
+		    				System.out.print("Move was valid\n");
+			    			//make the point clicked the color of the previous point clicked
+			    			gamePieces[pieceClicked.row][pieceClicked.column].pColor = playerColor;
+			    			gamePieces[pieceClicked.row][pieceClicked.column].repaint();
+			    			//make the previous point turn gray
+			    			gamePieces[prevMoveDrawn.xLoc][prevMoveDrawn.yLoc].pColor = Color.GRAY;
+			    			gamePieces[prevMoveDrawn.xLoc][prevMoveDrawn.yLoc].repaint();
+			    			//modify potential moves back to gray
+			    	    	for(adjLoc p : prevMove.adjacentLocations)
+			    			{
+			    				if (gamePieces[p.row][p.column].pColor == Color.YELLOW)
+			    				{
+			    					gamePieces[p.row][p.column].pColor = Color.GRAY;
+			    					gamePieces[p.row][p.column].repaint();
+			    				}
+			    			}
+			    	    	//returns the list of pieces that need to be painted
+			    	    	ArrayList<Piece> piecesToColor = board.move(moveToPlay);
+			    	    	//re-color captured pieces
+			    	    	for(Piece p : piecesToColor)
+			    			{
+			    					gamePieces[p.row][p.column].pColor = Color.GRAY;
+			    					gamePieces[p.row][p.column].repaint();
+			    			}
+			    			
+			    	    	System.out.print("Moved to x:" + gamePiece.xLoc+" y:"+gamePiece.yLoc + " from x:" +prevMove.row +" y:"+prevMove.column +"\n" );
+			    	    	//set up for next turn
+			    	    	prevMoveDrawn = null;
+			    	    	prevMove = null;
+			    			isMoveState2 = false;
+			    			if(!board.chain)
+			    				changeTurn();//the board will automatically change the turn, the gui needs to be updated manually though
+			    			runAIMove(moveToPlay);
+			    			updateInfoPanel();
+		    			}
+					} 
+	    			catch (BadMoveException e1) {
+						e1.printStackTrace();
+						//TODO something about the GameOverException
 					}
-					//then set the value externally
-	    			if (board.isValidMove(moveToPlay))
-	    			{
-		    			//make the point clicked the color of the previous point clicked
-		    			gamePieces[pieceClicked.row][pieceClicked.column].pColor = prevMoveDrawn.pColor;
-		    			gamePieces[pieceClicked.row][pieceClicked.column].repaint();
-		    			//make the previous point turn gray
-		    			gamePieces[prevMoveDrawn.xLoc][prevMoveDrawn.yLoc].pColor = Color.GRAY;
-		    			gamePieces[prevMoveDrawn.xLoc][prevMoveDrawn.yLoc].repaint();
-		    			//modify potential moves back to gray
-		    	    	for(adjLoc p : prevMove.adjacentLocations)
-		    			{
-		    				if (gamePieces[p.row][p.column].pColor == Color.YELLOW)
-		    				{
-		    					gamePieces[p.row][p.column].pColor = Color.GRAY;
-		    					gamePieces[p.row][p.column].repaint();
-		    				}
-		    			}
-		    	    	//returns the list of pieces that need to be painted
-		    	    	ArrayList<Piece> piecesToColor = board.move(moveToPlay);
-		    	    	//re-color captured pieces
-		    	    	for(Piece p : piecesToColor)
-		    			{
-		    					gamePieces[p.row][p.column].pColor = Color.GRAY;
-		    					gamePieces[p.row][p.column].repaint();
-		    			}
-		    			
-		    	    	System.out.print("Moved to x:" + gamePiece.xLoc+" y:"+gamePiece.yLoc + " from x:" +prevMove.row +" y:"+prevMove.column +"\n" );
-		    	    	//set up for next turn
-		    	    	prevMoveDrawn = null;
-		    	    	prevMove = null;
-		    			isMoveState2 = false;
-		    			if(!board.chain)
-		    				changeTurn();//the board will automatically change the turn, the gui needs to be updated manually though
-		    			runAIMove(moveToPlay);
-		    			updateInfoPanel();
-	    			}
-				} 
-    			catch (BadMoveException e1) {
-					e1.printStackTrace();
-					//TODO something about the GameOverException
-				}
-    			catch (GameOverException e2) {
-	    			//TODO check if game over by win
-	    			//TODO check if game over by win or by too many moves
-				}
-    		}
-    		else if (gamePiece.pColor !=Color.YELLOW && gamePiece.pColor != Color.GRAY && !isMoveState2)
-    		{
-    			try
-    			{
-    			//highlight all available moves, if not making a move, and if the piece clicked isn't gray
-    			//TODO THIS NEEDS TO TAKE INTO ACCOUNT OTHER CAPTURES ON THE BOARD EVENTUALLY
-    			//getValidMoves(Color), returns a list of moves, List<Move>
-    			//using the start location given by the click, iterate through List<Move> to find all available moves
-    			//using the clicked piece to start
-    			//then color those
-    			ArrayList<Move> validMoves = board.getValidMoves(board.turn);
-    			boolean ColorChanged = false;
-	    		for(Move m : validMoves)
-	    		{
-	    			if (m.start == pieceClicked)
-	    			{
-	    				ColorChanged = true;
-	    				gamePieces[m.end.row][m.end.column].pColor = Color.YELLOW;
-	    				gamePieces[m.end.row][m.end.column].repaint();
-	    			}
+	    			catch (GameOverException e2) {
+		    			//TODO check if game over by win
+		    			//TODO check if game over by win or by too many moves
+					}
 	    		}
-	    		if(ColorChanged)
+	    		else if (gamePiece.pColor !=Color.YELLOW && gamePiece.pColor != Color.GRAY && !isMoveState2)
 	    		{
-	    			prevMoveDrawn=gamePiece;
-	    			prevMove=pieceClicked;
-	    			isMoveState2 = true;
+	    			try
+	    			{
+	    			//highlight all available moves, if not making a move, and if the piece clicked isn't gray
+	    			//TODO THIS NEEDS TO TAKE INTO ACCOUNT OTHER CAPTURES ON THE BOARD EVENTUALLY
+	    			//getValidMoves(Color), returns a list of moves, List<Move>
+	    			//using the start location given by the click, iterate through List<Move> to find all available moves
+	    			//using the clicked piece to start
+	    			//then color those
+	    			ArrayList<Move> validMoves = board.getValidMoves(board.turn);
+	    			boolean ColorChanged = false;
+	    			if(validMoves.isEmpty())
+	    			{
+	    				
+	    			}
+		    		for(Move m : validMoves)
+		    		{
+		    			if (m.start == pieceClicked)
+		    			{
+		    				ColorChanged = true;
+		    				gamePieces[m.end.row][m.end.column].pColor = Color.YELLOW;
+		    				gamePieces[m.end.row][m.end.column].repaint();
+		    			}
+		    		}
+		    		if(ColorChanged)
+		    		{
+		    			prevMoveDrawn=gamePiece;
+		    			prevMove=pieceClicked;
+		    			isMoveState2 = true;
+		    		}
+		    		System.out.print("Clicked x:" + gamePiece.xLoc+" y:"+gamePiece.yLoc+"\n");
+	    			}
+	    			catch (BadMoveException e1) 
+	    			{
+						e1.printStackTrace();
+						//TODO something about the GameOverException
+					}
 	    		}
-	    		System.out.print("Clicked x:" + gamePiece.xLoc+" y:"+gamePiece.yLoc+"\n");
-    			}
-    			catch (BadMoveException e1) 
-    			{
-					e1.printStackTrace();
-					//TODO something about the GameOverException
-				}
     		}		
     	}
     }
