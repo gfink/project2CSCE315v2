@@ -16,7 +16,7 @@ public class Piece {
 		}
 	}
 	private enum PieceState{
-		BLACK,WHITE,EMPTY
+		BLACK, WHITE, EMPTY
 	}
 	public int row;
 	public int column;
