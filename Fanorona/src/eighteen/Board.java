@@ -2,6 +2,7 @@ package eighteen;
 
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import eighteen.Piece.adjLoc;
@@ -586,5 +587,23 @@ public class Board {
 		else {
 			return Color.WHITE;
 		}
+	}
+	
+	public boolean equals(Board b) {
+		if(blacks == b.blacks && whites == b.whites && moves == b.moves && chain == b.chain) {
+			if(chainColor.equals(b.chainColor) && previousSpot.equals(b.previousSpot)) {
+				if(previousDirection == b.previousDirection && previousLocations.equals(b.previousLocations)) {
+					if(chainMoves.equals(b.chainMoves) && turn.equals(b.turn)) {
+						for(int i = 0; i < ROWS; i++) {
+							if(!Arrays.equals(theBoard[i], b.theBoard[i])) {
+								return false;
+							}
+						}
+						return true;
+					}
+				}
+			}
+		}
+		return false;
 	}
 }
