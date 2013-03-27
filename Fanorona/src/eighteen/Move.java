@@ -91,9 +91,9 @@ public class Move {
 	}
 	
 	public boolean equals(Move moveToCompare) {
-		if(start != moveToCompare.getStart())
+		if(!start.equals(moveToCompare.getStart()))
 			return false;
-		if(end != moveToCompare.getEnd())
+		if(!end.equals(moveToCompare.getEnd()))
 			return false;
 		if(state != moveToCompare.getState())
 			return false;
