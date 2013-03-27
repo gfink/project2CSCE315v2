@@ -10,6 +10,7 @@ import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import eighteen.Board.BadMoveException;
@@ -19,14 +20,14 @@ public class FanoronaGUI extends JFrame {
 	//TODO if choice between pieces, pick attacking or retreating
 	//TODO end move button
 	//TODO show whose turn it is
-	//TODO show how many pieces each side has
-	//TODO show how many moves have been made
 	//TODO show the utility value of the board (for the user)
 	JButton helpb; //TODO add to a tool bar
 	Board board; //contains the array of pieces and board management functions
 	DrawnPiece[][] gamePieces;
 	DrawnPiece prevMoveDrawn;
 	Piece prevMove;
+	JLabel blackPieces,whitePieces,movesMade,utilityVal,currentTurn;
+	private String playerTurn = "WHITE";
 	Container game = getContentPane();
 	PieceListener clicked;//given to every piece in a loop
 	
@@ -35,6 +36,40 @@ public class FanoronaGUI extends JFrame {
     
     public static void main(String[] args) {
        GUI =  new FanoronaGUI();
+    }
+    public void changeTurn()
+    {
+    	if (playerTurn=="WHITE")
+    		playerTurn = "BLACK";
+    	else
+    		playerTurn = "WHITE";
+    	
+    }
+    public void makeInfoPanel()
+    {
+    	JPanel InfoPanel = new JPanel();
+    	GridLayout Lay = new GridLayout();
+    	InfoPanel.setLayout(Lay);
+    	InfoPanel.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
+    	blackPieces = new JLabel("Black: "+board.blacks);
+    	whitePieces = new JLabel("White: "+board.whites);
+    	movesMade = new JLabel("Move: "+board.moves);
+    	utilityVal = new JLabel("Utility: "+board.Utility());
+    	currentTurn = new JLabel("Turn: " + playerTurn);
+    	InfoPanel.add(blackPieces);
+    	InfoPanel.add(whitePieces);
+    	InfoPanel.add(movesMade);
+    	InfoPanel.add(utilityVal);
+    	InfoPanel.add(currentTurn);
+    	game.add(InfoPanel,BorderLayout.SOUTH);
+    }
+    public void updateInfoPanel()
+    {
+    	blackPieces.setText("Black: "+board.blacks);
+    	whitePieces.setText("White: "+board.whites);
+    	movesMade.setText("Move: "+board.moves);
+    	utilityVal.setText("Utility: "+board.Utility());
+    	currentTurn.setText("Turn: " + playerTurn);
     }
     public void makePieces()
     {
@@ -94,17 +129,20 @@ public class FanoronaGUI extends JFrame {
     {
     	//eventually display that the move was reset visually
     	System.out.print("ResetPrevMove\n");
-    	for(adjLoc p : prevMove.adjacentLocations)
-		{
-			if (gamePieces[p.row][p.column].pColor == Color.YELLOW)
+    	if(prevMove != null)
+    	{
+	    	for(adjLoc p : prevMove.adjacentLocations)
 			{
-				gamePieces[p.row][p.column].pColor = Color.GRAY;
-				gamePieces[p.row][p.column].repaint();
+				if (gamePieces[p.row][p.column].pColor == Color.YELLOW)
+				{
+					gamePieces[p.row][p.column].pColor = Color.GRAY;
+					gamePieces[p.row][p.column].repaint();
+				}
 			}
-		}
-    	prevMoveDrawn = null;
-    	prevMove = null;
-    	isMoveState2=false;
+	    	prevMoveDrawn = null;
+	    	prevMove = null;
+	    	isMoveState2=false;
+    	}
     }
     public void makePieceListeners()
     {
@@ -128,8 +166,9 @@ public class FanoronaGUI extends JFrame {
     	prevMoveDrawn = new DrawnPiece(0,0,Color.GRAY);
     	
     	makePieces();
-    	//makeBoard();
+    	makeBoard();
     	//makeHelpButton();
+    	makeInfoPanel();
     	makeMoveCancelButton();
     	makePieceListeners();
     	setSize(500,350);
@@ -177,10 +216,14 @@ public class FanoronaGUI extends JFrame {
 		    					gamePieces[p.row][p.column].pColor = Color.GRAY;
 		    					gamePieces[p.row][p.column].repaint();
 		    			}
-		    			System.out.print("Moved to x:" + gamePiece.xLoc+" y:"+gamePiece.yLoc + "from x:" +prevMove.column +" y:"+prevMove.row +"\n" );
+		    			
+		    	    	System.out.print("Moved to x:" + gamePiece.xLoc+" y:"+gamePiece.yLoc + "from x:" +prevMove.column +" y:"+prevMove.row +"\n" );
+		    	    	//set up for next turn
 		    	    	prevMoveDrawn = null;
 		    	    	prevMove = null;
 		    			isMoveState2 = false;
+		    			changeTurn();
+		    			updateInfoPanel();
 	    			}
 				} 
     			catch (BadMoveException e1) 
@@ -194,18 +237,23 @@ public class FanoronaGUI extends JFrame {
     			
     			//highlight all available moves, if not making a move, and if the piece clicked isn't gray
     			//THIS NEEDS TO TAKE INTO ACCOUNT OTHER CAPTURES ON THE BOARD EVENTUALLY
+    			boolean ColorChanged = false;
 	    		for(adjLoc p : pieceClicked.adjacentLocations)
 	    		{
 	    			if (gamePieces[p.row][p.column].pColor == Color.GRAY)
 	    			{
+	    				ColorChanged = true;
 	    				gamePieces[p.row][p.column].pColor = Color.YELLOW;
 	    				gamePieces[p.row][p.column].repaint();
 	    			}
 	    			//gamePieces[prevMoveDrawn.xLoc][prevMoveDrawn.yLoc].pColor = Color.GRAY;
 	    		}
-	    		prevMoveDrawn=gamePiece;
-	    		prevMove=pieceClicked;
-	    		isMoveState2 = true;
+	    		if(ColorChanged)
+	    		{
+	    			prevMoveDrawn=gamePiece;
+	    			prevMove=pieceClicked;
+	    			isMoveState2 = true;
+	    		}
 	    		System.out.print("Clicked x:" + gamePiece.xLoc+" y:"+gamePiece.yLoc+"\n");
     		}
     		
