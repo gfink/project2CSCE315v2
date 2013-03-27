@@ -53,8 +53,9 @@ public class AI {
 			try {
 				ArrayList<Piece> temp = newBoard.move(move);
 				TreeNode newRoot = new TreeNode(newBoard);
-			} catch (BadMoveException | GameOverException e) {
-				// TODO Auto-generated catch block
+			} catch (BadMoveException e) {
+				e.printStackTrace();
+			} catch (GameOverException e) {
 				e.printStackTrace();
 			}
 		}
