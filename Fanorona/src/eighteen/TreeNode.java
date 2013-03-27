@@ -3,6 +3,8 @@ package eighteen;
 import java.util.ArrayList;
 import java.util.List;
 
+import eighteen.Board.BadBoardException;
+
 public class TreeNode {
 	private List<TreeNode> children;
 	private TreeNode parent;
@@ -12,7 +14,12 @@ public class TreeNode {
 
 	public TreeNode() {
 		children = new ArrayList<TreeNode>();
-		board = new Board();
+		try {
+			board = new Board();
+		} catch (BadBoardException e) {
+			//This should never happen
+			e.printStackTrace();
+		}
 		value = 0;
 		traversalValue = 0;
 	}

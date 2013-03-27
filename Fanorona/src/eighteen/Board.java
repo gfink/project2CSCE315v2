@@ -7,14 +7,26 @@ import java.util.List;
 public class Board {
 
 	public static class BadMoveException extends Exception {
+		private static final long serialVersionUID = -4508322448788975541L;
+
 		public BadMoveException(String message){
 			super(message);
 		}
 	}
 	
 	public static class BadBoardException extends Exception {
+		private static final long serialVersionUID = -1512647492285542624L;
+
 		public BadBoardException() {
 			super("Board doesn't have allowable number of rows or columns");
+		}
+	}
+	
+	public static class GameOverException extends Exception {
+		private static final long serialVersionUID = 8578520222249569915L;
+
+		public GameOverException(String winner) {
+			super("Game over with winner " + winner);
 		}
 	}
 	
@@ -38,21 +50,18 @@ public class Board {
 	
 	public static int ROWS;
 	public static int COLUMNS;
+	public static int MAXMOVES;
 	
-	public Board() {
+	public Board() throws BadBoardException {
 		this(5,13);
 	}
 	
-	public Board(int rows, int columns) {
-		//TODO: throw exceptions for bad number of rows or columns
-		//TODO: Change max moves
+	public Board(int rows, int columns) throws BadBoardException {
 		resetBoard(rows, columns);
 	}
 	
 	public Board(Board b) {
-		ROWS = b.ROWS;
-		COLUMNS = b.COLUMNS;
-		theBoard = new Piece[b.ROWS][b.COLUMNS];
+		theBoard = new Piece[ROWS][COLUMNS];
 		for(int i = 0; i < ROWS; i++) {
 			System.arraycopy(b.theBoard, 0, theBoard, 0, COLUMNS);
 		}
@@ -80,9 +89,13 @@ public class Board {
 		ret -= 100;
 		return ret;
 	}
-	private void resetBoard(int rows, int columns) {
+	private void resetBoard(int rows, int columns) throws BadBoardException {
+		if((rows < 1 || rows > 13) || (columns < 1 || columns > 13) || (rows % 2 == 0) || (columns % 2 == 0)) {
+			throw new BadBoardException();
+		}
 		ROWS = rows;
 		COLUMNS = columns;
+		MAXMOVES = COLUMNS * 10;
 		theBoard = new Piece[ROWS][COLUMNS];
 		for(int i = 0; i < ROWS; i++) {
 			for(int j = 0; j < COLUMNS; j++) {
@@ -123,7 +136,7 @@ public class Board {
 	}
 	
 	//Returns whether the game is over
-	public ArrayList<Piece> move(Move mov, AttackState state) throws BadMoveException {
+	public ArrayList<Piece> move(Move mov, AttackState state) throws BadMoveException, GameOverException {
 		if(!isValidMove(mov)) {
 			throw new BadMoveException("Bad move at [" + mov.getStart().row + ", " + mov.getStart().column + "] to [" + mov.getEnd().row + ", " + mov.getEnd().column + "]");
 		}
@@ -138,6 +151,21 @@ public class Board {
 				chainColor = mov.getStart().getColor();
 				chainMoves = new ArrayList<Move>();
 				moves++;
+				if(moves > MAXMOVES) {
+					String winner = "";
+					if(whites == 0) {
+						if(blacks == 0) {
+							winner = "tie";
+						}
+						else {
+							winner = "black";
+						}
+					}
+					else {
+						winner = "white";
+					}
+					throw new GameOverException(winner);
+				}
 			}
 			else if(new Piece.adjLoc(mov.getStart()) != previousSpot) {
 				throw new BadMoveException("Bad move at [" + mov.getStart().row + ", " + mov.getStart().column + "] -> Wrong starting spot");

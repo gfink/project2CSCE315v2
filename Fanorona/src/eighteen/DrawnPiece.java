@@ -5,6 +5,7 @@ import java.awt.geom.Ellipse2D;
 import javax.swing.*;
 //using model code from here http://harryjoy.com/2011/08/21/different-button-shapes-in-swing/
 public class DrawnPiece extends JButton{
+	private static final long serialVersionUID = 5422176987616663895L;
 	public int xLoc;
 	public int yLoc;
 	public Color pColor;
