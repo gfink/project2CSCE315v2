@@ -46,7 +46,29 @@ public class AI {
 				addLevel(child);
 	}
 	
-	private ArrayList<Move> alphaBetaSearch() throws BadMoveException {
+	public void opponentMove(Move move) {
+		TreeNode root = minMaxTree.getRoot();
+		if(!root.hasChildren()) {
+			Board newBoard = root.board;
+			try {
+				ArrayList<Piece> temp = newBoard.move(move);
+				TreeNode newRoot = new TreeNode(newBoard);
+			} catch (BadMoveException | GameOverException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		else {
+			for(TreeNode child: root.getChildren()) {
+				if(child.getMove().equals(move)) {
+					minMaxTree.setRoot(child);
+					break;
+				}
+			}
+		}
+	}
+	
+	public ArrayList<Move> alphaBetaSearch() throws BadMoveException {
 		TreeNode root = minMaxTree.getRoot();
 		if(!root.hasChildren())
 			getNewLevel();
@@ -62,7 +84,7 @@ public class AI {
 		return new ArrayList<Move>();
 	}
 	
-	private double maxValue(TreeNode state, double alpha, double beta) {
+	public double maxValue(TreeNode state, double alpha, double beta) {
 		if(!state.hasChildren())
 			return state.value;
 		
@@ -76,7 +98,7 @@ public class AI {
 		return alpha;
 	}
 	
-	private double minValue(TreeNode state, double alpha, double beta) {
+	public double minValue(TreeNode state, double alpha, double beta) {
 		if(!state.hasChildren())
 			return state.value;
 		
