@@ -38,7 +38,7 @@ public class TreeNode {
 		value = board.Utility();
 	}
 	
-	public ArrayList<Move> getMove() {
+	public ArrayList<Move> getMoves() {
 		return board.chainMoves;
 	}
 	

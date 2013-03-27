@@ -27,7 +27,7 @@ public class AI {
 	
 	public void addLevel(TreeNode node) throws BadMoveException {
 		if(!node.hasChildren()) {
-			Color color = Board.oppositeColor(node.getMove().get(0).getColor());
+			Color color = Board.oppositeColor(node.getMoves().get(0).getColor());
 			List<Move> validMoves = node.board.getValidMoves(color);
 			for(Move move: validMoves) {
 				Board tempBoard = new Board(node.board); 
@@ -61,7 +61,7 @@ public class AI {
 		}
 		else {
 			for(TreeNode child: root.getChildren()) {
-				if(child.getMove().equals(move)) {
+				if(child.getMoves().equals(move)) {
 					minMaxTree.setRoot(child);
 					break;
 				}
@@ -74,13 +74,15 @@ public class AI {
 		if(!root.hasChildren())
 			getNewLevel();
 		double value;
-		if (root.getMove().get(0).getColor() != myColor)
+		if (root.getMoves().get(0).getColor() != myColor)
 			value = maxValue(root, -999999, 999999);
 		else
 			value = minValue(root, -999999, 999999);
 		for(TreeNode child: root.getChildren()) {
-			if(child.traversalValue == value)
-				return child.getMove();
+			if(child.traversalValue == value) {
+				minMaxTree.setRoot(child);
+				return child.getMoves();
+			}
 		}
 		return new ArrayList<Move>();
 	}
