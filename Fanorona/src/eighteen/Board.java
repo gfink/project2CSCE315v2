@@ -147,7 +147,6 @@ public class Board {
 	
 	//Returns whether the game is over
 	public ArrayList<Piece> move(Move mov) throws BadMoveException, GameOverException {
-		//TODO: Check removal of pieces
 		if(!isValidMove(mov)) {
 			throw new BadMoveException("Bad move at [" + mov.getStart().row + ", " + mov.getStart().column + "] to [" + mov.getEnd().row + ", " + mov.getEnd().column + "]");
 		}
@@ -347,11 +346,11 @@ public class Board {
 	 * (e.g. If a capture is possible at another location on the board,
 	 *       this can still return a paika move)
 	 */
-	public List<Move> getValidChainMoves(adjLoc place) throws BadMoveException {
+	public ArrayList<Move> getValidChainMoves(adjLoc place) throws BadMoveException {
 		return getValidChainMoves(place.row, place.column);
 	}
 	
-	public List<Move> getValidChainMoves(int x, int y) throws BadMoveException {
+	public ArrayList<Move> getValidChainMoves(int x, int y) throws BadMoveException {
 		ArrayList<Move> capture = new ArrayList<Move>();
 		Piece start = getPiece(x,y);
 		
@@ -466,7 +465,7 @@ public class Board {
 	}
 	
 	// Gets valid moves for a specific color on the entire board
-	public List<Move> getValidMoves(Color color) throws BadMoveException {
+	public ArrayList<Move> getValidMoves(Color color) throws BadMoveException {
 		ArrayList<Move> capture = new ArrayList<Move>();
 		ArrayList<Move> paika = new ArrayList<Move>();
 		
