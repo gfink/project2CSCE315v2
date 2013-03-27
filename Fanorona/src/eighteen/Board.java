@@ -240,8 +240,12 @@ public class Board {
 		}
 		if(Piece.isValidSpace(mov.getStart().row, mov.getStart().column) && !mov.getStart().equals(mov.getEnd())) {
 			//Checks for Diagonal moves
-			if(mov.getStart().adjacentLocations.contains(mov.getEnd())) {
-				return true;
+			for(Piece.adjLoc p : mov.getStart().adjacentLocations)
+			{
+				if(p.column == mov.getEnd().column && p.row == mov.getEnd().row) 
+				{
+					return true;
+				}
 			}
 		}
 		return false;

@@ -23,11 +23,13 @@ public class FanoronaGUI extends JFrame {
 	//TODO show how many moves have been made
 	//TODO show the utility value of the board (for the user)
 	JButton helpb; //TODO add to a tool bar
-	Board board;
+	Board board; //contains the array of pieces and board management functions
 	DrawnPiece[][] gamePieces;
+	DrawnPiece prevMoveDrawn;
+	Piece prevMove;
 	Container game = getContentPane();
-	PieceListener clicked;
-	DrawnPiece prevMove;
+	PieceListener clicked;//given to every piece in a loop
+	
 	Boolean isMoveState2 = false;
     public static FanoronaGUI GUI;
     
@@ -36,26 +38,28 @@ public class FanoronaGUI extends JFrame {
     }
     public void makePieces()
     {
+    	System.out.print("Making the pieces\n");
     	JPanel jBoard = new JPanel();
     	jBoard.setLayout(new GridLayout(board.ROWS,board.COLUMNS,15,15));
         for(int x= 0;x<board.ROWS;x++)
         {
         	for(int y = 0; y<board.COLUMNS; y++)
         	{
+        		//System.out.print("Making the piece x:" + x + " y:" + y);
         		if(board.theBoard[x][y].getColor() == Color.BLACK)
         		{
         			gamePieces[x][y] = new DrawnPiece(x,y,Color.BLACK);
-        			gamePieces[x][y].setBackground(Color.BLACK);
+        			//gamePieces[x][y].setBackground(Color.BLACK);
         		}
         		else if(board.theBoard[x][y].getColor() == Color.WHITE)
         		{
         			gamePieces[x][y] = new DrawnPiece(x,y,Color.WHITE);
-        			gamePieces[x][y].setBackground(Color.WHITE);
+        			//gamePieces[x][y].setBackground(Color.WHITE);
         		}
         		else
         		{
         			gamePieces[x][y] = new DrawnPiece(x,y,Color.GRAY);
-        			gamePieces[x][y].setBackground(Color.GRAY);
+        			//gamePieces[x][y].setBackground(Color.GRAY);
         		}
         		jBoard.add(gamePieces[x][y]);
         	}
@@ -74,6 +78,34 @@ public class FanoronaGUI extends JFrame {
          });
          game.add(helpb,BorderLayout.NORTH);
     }
+    public void makeMoveCancelButton()
+    {
+    	 helpb = new JButton("Cancel Move");
+         helpb.setBounds(50,60,80,30);
+         helpb.addActionListener(new ActionListener() {
+             public void actionPerformed(ActionEvent event) {
+            	 isMoveState2 = false;
+            	 resetPrevMove();
+             }
+         });
+         game.add(helpb,BorderLayout.NORTH);
+    }
+    public void resetPrevMove()
+    {
+    	//eventually display that the move was reset visually
+    	System.out.print("ResetPrevMove\n");
+    	for(adjLoc p : prevMove.adjacentLocations)
+		{
+			if (gamePieces[p.row][p.column].pColor == Color.YELLOW)
+			{
+				gamePieces[p.row][p.column].pColor = Color.GRAY;
+				gamePieces[p.row][p.column].repaint();
+			}
+		}
+    	prevMoveDrawn = null;
+    	prevMove = null;
+    	isMoveState2=false;
+    }
     public void makePieceListeners()
     {
     	clicked = new PieceListener(); 
@@ -87,19 +119,20 @@ public class FanoronaGUI extends JFrame {
     }
     public void makeBoard()
     {
-    	
+    	//this will make the diagonals
     }
     public FanoronaGUI() {
     	game.setLayout(new BorderLayout());
-    	board = new Board(5,13);
+    	board = new Board(5,13);//eventually need user input here
     	gamePieces = new DrawnPiece[Board.ROWS][Board.COLUMNS];
-    	prevMove = new DrawnPiece(0,0,Color.GRAY);
+    	prevMoveDrawn = new DrawnPiece(0,0,Color.GRAY);
     	
     	makePieces();
     	//makeBoard();
-    	makeHelpButton();
+    	//makeHelpButton();
+    	makeMoveCancelButton();
     	makePieceListeners();
-    	setSize(1000,700);
+    	setSize(500,350);
         setTitle("Fanorona");
         
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -108,46 +141,78 @@ public class FanoronaGUI extends JFrame {
     }
     class PieceListener implements ActionListener
     {
-    	/*
-			isMoveState2 tells us if the user is in MoveState1 or MoveState2
-			if isMoveState2 is false, or in MoveState1, the user is picking a piece
-			if isMoveState2 is true, or in MoveState2, the user is picking a location for the piece to move
-		
-    	 */
     	public void actionPerformed(ActionEvent e)
     	{
-    		//needs to call some sort of isValidMove function before trying to run the move
     		DrawnPiece gamePiece = (DrawnPiece) e.getSource();
-    		Piece pointsClicked = board.theBoard[gamePiece.xLoc][gamePiece.yLoc];
+    		Piece pieceClicked = board.theBoard[gamePiece.xLoc][gamePiece.yLoc];
     		//first check if the piece clicked is an available piece
-    		if (gamePiece.pColor == Color.YELLOW)//already selected
+    		if (gamePiece.pColor == Color.YELLOW && isMoveState2)//already selected
     		{
-    			//make the point clicked the color of the previous point clicked
-    			gamePieces[pointsClicked.row][pointsClicked.column].pColor = prevMove.pColor;
-    			gamePieces[pointsClicked.row][pointsClicked.column].repaint();
-    			//make the previous point turn gray
-    			gamePieces[prevMove.xLoc][prevMove.yLoc].pColor = Color.GRAY;
-    			gamePieces[prevMove.xLoc][prevMove.yLoc].repaint();
-    			//THIS IS THE POINT WHERE A MOVE SHOULD BE MADE
-    			//ALL PIECES INVOLVED IN A MOVE NEED TO BE REPAINTED AT THIS POINT
+    			try
+    			{
+	    			Move moveToPlay = null;
+					moveToPlay = new Move(prevMove, new Piece.adjLoc(pieceClicked), true, true);
+	    			if (board.isValidMove(moveToPlay))
+	    			{
+		    			//make the point clicked the color of the previous point clicked
+		    			gamePieces[pieceClicked.row][pieceClicked.column].pColor = prevMoveDrawn.pColor;
+		    			gamePieces[pieceClicked.row][pieceClicked.column].repaint();
+		    			//make the previous point turn gray
+		    			gamePieces[prevMoveDrawn.xLoc][prevMoveDrawn.yLoc].pColor = Color.GRAY;
+		    			gamePieces[prevMoveDrawn.xLoc][prevMoveDrawn.yLoc].repaint();
+		    			//modify potential moves back to gray
+		    	    	for(adjLoc p : prevMove.adjacentLocations)
+		    			{
+		    				if (gamePieces[p.row][p.column].pColor == Color.YELLOW)
+		    				{
+		    					gamePieces[p.row][p.column].pColor = Color.GRAY;
+		    					gamePieces[p.row][p.column].repaint();
+		    				}
+		    			}
+		    	    	//returns the list of pieces that need to be painted
+		    	    	ArrayList<Piece> piecesToColor = board.move(moveToPlay);
+		    	    	//re-color captured pieces
+		    	    	for(Piece p : piecesToColor)
+		    			{
+		    					gamePieces[p.row][p.column].pColor = Color.GRAY;
+		    					gamePieces[p.row][p.column].repaint();
+		    			}
+		    			System.out.print("Moved to x:" + gamePiece.xLoc+" y:"+gamePiece.yLoc + "from x:" +prevMove.column +" y:"+prevMove.row +"\n" );
+		    	    	prevMoveDrawn = null;
+		    	    	prevMove = null;
+		    			isMoveState2 = false;
+	    			}
+				} 
+    			catch (BadMoveException e1) 
+    			{
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
     		}
-    		else
+    		else if (gamePiece.pColor !=Color.YELLOW && gamePiece.pColor != Color.GRAY && !isMoveState2)
     		{
+    			
     			//highlight all available moves, if not making a move, and if the piece clicked isn't gray
-	    		for(adjLoc p : pointsClicked.adjacentLocations)
+    			//THIS NEEDS TO TAKE INTO ACCOUNT OTHER CAPTURES ON THE BOARD EVENTUALLY
+	    		for(adjLoc p : pieceClicked.adjacentLocations)
 	    		{
 	    			if (gamePieces[p.row][p.column].pColor == Color.GRAY)
 	    			{
 	    				gamePieces[p.row][p.column].pColor = Color.YELLOW;
 	    				gamePieces[p.row][p.column].repaint();
 	    			}
-	    			gamePieces[prevMove.xLoc][prevMove.yLoc].pColor = Color.GRAY;
+	    			//gamePieces[prevMoveDrawn.xLoc][prevMoveDrawn.yLoc].pColor = Color.GRAY;
 	    		}
-	    	prevMove=gamePiece;
+	    		prevMoveDrawn=gamePiece;
+	    		prevMove=pieceClicked;
+	    		isMoveState2 = true;
+	    		System.out.print("Clicked x:" + gamePiece.xLoc+" y:"+gamePiece.yLoc+"\n");
     		}
-    		//after click is done, set the previous move to the last piece clicked, records x, y, and color
     		
-    		System.out.print("Clicked x:" + gamePiece.xLoc+" y: "+gamePiece.yLoc+"\n");
+    		//System.out.print("Clicked x:" + gamePiece.xLoc+" y:"+gamePiece.yLoc+"\n");
+    		
+    		//WAIT FOR AI OR OPPONENT MOVE HERE
+    		//System.out.print(isMoveState2 +" \n");
     		
     	}
     }
