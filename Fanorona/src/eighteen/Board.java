@@ -167,7 +167,7 @@ public class Board {
 			if(previousLocations.contains(mov.getEnd())) {
 				throw new BadMoveException("Bad move at [" + mov.getStart().row + ", " + mov.getStart().column + "] -> That space has already been moved to in this chain");
 			}
-			else if(new Piece.adjLoc(mov.getStart()) != previousSpot) {
+			else if(!(new Piece.adjLoc(mov.getStart())).equals(previousSpot)) {
 				System.out.println("Previous spot = [" + previousSpot.row + " ," + previousSpot.column + "]");
 				throw new BadMoveException("Bad move at [" + mov.getStart().row + ", " + mov.getStart().column + "] -> Wrong starting spot");
 			}
