@@ -97,8 +97,9 @@ public class Piece {
 		return false;
 	}
 	
-	public void adjacentLocations() {
-		if(row + column % 2 == 0) {
+	public void adjacentLocations() 
+	{
+		if((row + column) % 2 == 0) {
 			if(isValidSpace(row - 1, column - 1))
 				adjacentLocations.add(new adjLoc(row - 1, column - 1));
 			if(isValidSpace(row - 1, column + 1))

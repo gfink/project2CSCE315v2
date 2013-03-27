@@ -19,9 +19,9 @@ import eighteen.Piece.adjLoc;
 public class FanoronaGUI extends JFrame {
 	//TODO if choice between pieces, pick attacking or retreating
 	//TODO end move button
-	//TODO show whose turn it is
-	//TODO show the utility value of the board (for the user)
-	JButton helpb; //TODO add to a tool bar
+	//TODO add to a tool bar or button bar containing buttons for help, 
+			//end move, attack/retreat, game setup options, connect to opponent
+	JButton helpb; 
 	Board board; //contains the array of pieces and board management functions
 	DrawnPiece[][] gamePieces;
 	DrawnPiece prevMoveDrawn;
@@ -73,28 +73,23 @@ public class FanoronaGUI extends JFrame {
     }
     public void makePieces()
     {
-    	System.out.print("Making the pieces\n");
     	JPanel jBoard = new JPanel();
     	jBoard.setLayout(new GridLayout(board.ROWS,board.COLUMNS,15,15));
         for(int x= 0;x<board.ROWS;x++)
         {
         	for(int y = 0; y<board.COLUMNS; y++)
         	{
-        		//System.out.print("Making the piece x:" + x + " y:" + y);
         		if(board.theBoard[x][y].getColor() == Color.BLACK)
         		{
         			gamePieces[x][y] = new DrawnPiece(x,y,Color.BLACK);
-        			//gamePieces[x][y].setBackground(Color.BLACK);
         		}
         		else if(board.theBoard[x][y].getColor() == Color.WHITE)
         		{
         			gamePieces[x][y] = new DrawnPiece(x,y,Color.WHITE);
-        			//gamePieces[x][y].setBackground(Color.WHITE);
         		}
         		else
         		{
         			gamePieces[x][y] = new DrawnPiece(x,y,Color.GRAY);
-        			//gamePieces[x][y].setBackground(Color.GRAY);
         		}
         		jBoard.add(gamePieces[x][y]);
         	}
@@ -157,6 +152,10 @@ public class FanoronaGUI extends JFrame {
     }
     public void makeBoard()
     {
+    	/*
+    	 * need to know the logic behind options to move pieces
+    	 * then just draw a few lines to show options for moves
+    	 */
     	//this will make the diagonals
     }
     public FanoronaGUI() {
@@ -223,6 +222,9 @@ public class FanoronaGUI extends JFrame {
 		    	    	prevMove = null;
 		    			isMoveState2 = false;
 		    			changeTurn();
+		    			//check if game over by win
+		    			//ask for ai/opponent move
+		    			//check if game over by win or by too many moves
 		    			updateInfoPanel();
 	    			}
 				} 
