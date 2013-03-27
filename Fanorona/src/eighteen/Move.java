@@ -8,12 +8,13 @@ public class Move {
 	private Piece start;
 	private Piece.adjLoc end;
 	private Direction direction;
-	
+	AttackState state;
 	public Move() {}
 	
-	public Move(Piece start, Piece.adjLoc end, boolean isAdvancing, boolean isAttacking) throws BadMoveException {
+	public Move(Piece start, Piece.adjLoc end, AttackState state) throws BadMoveException {
 		this.start = start;
 		this.end = end;
+		this.state = state;
 		updateDirection();
 	}
 	
@@ -79,5 +80,13 @@ public class Move {
 	}
 	public Direction getDirection() {
 		return direction;
+	}
+	
+	public AttackState getState() {
+		return state;
+	}
+	
+	public void setState(AttackState state) {
+		this.state = state;
 	}
 }

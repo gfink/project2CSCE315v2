@@ -1,6 +1,7 @@
 package eighteen;
 
 import eighteen.Board.BadMoveException;
+import eighteen.Board.GameOverException;
 
 import java.awt.Color;
 import java.util.ArrayList;
@@ -30,7 +31,12 @@ public class AI {
 			List<Move> validMoves = node.board.getValidMoves(color);
 			for(Move move: validMoves) {
 				Board tempBoard = new Board(node.board); 
-				tempBoard.move(move);
+				try {
+					tempBoard.move(move);
+				} catch (GameOverException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 				TreeNode newChild = new TreeNode(tempBoard);
 				node.addChild(newChild);
 			}

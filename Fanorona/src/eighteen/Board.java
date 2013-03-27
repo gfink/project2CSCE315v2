@@ -79,9 +79,6 @@ public class Board {
 	public Piece getPiece(int x, int y) {
 		return theBoard[x][y];
 	}
-	//public void setPieceColor(int x, int y, Color color) {
-	//	(theBoard[x][y]).setColor(color);
-	//}
 	
 	public double Utility() {
 		double ret = ((double)whites) / ((double)(blacks + whites));
@@ -136,7 +133,7 @@ public class Board {
 	}
 	
 	//Returns whether the game is over
-	public ArrayList<Piece> move(Move mov, AttackState state) throws BadMoveException, GameOverException {
+	public ArrayList<Piece> move(Move mov) throws BadMoveException, GameOverException {
 		if(!isValidMove(mov)) {
 			throw new BadMoveException("Bad move at [" + mov.getStart().row + ", " + mov.getStart().column + "] to [" + mov.getEnd().row + ", " + mov.getEnd().column + "]");
 		}
@@ -151,21 +148,6 @@ public class Board {
 				chainColor = mov.getStart().getColor();
 				chainMoves = new ArrayList<Move>();
 				moves++;
-				if(moves > MAXMOVES) {
-					String winner = "";
-					if(whites == 0) {
-						if(blacks == 0) {
-							winner = "tie";
-						}
-						else {
-							winner = "black";
-						}
-					}
-					else {
-						winner = "white";
-					}
-					throw new GameOverException(winner);
-				}
 			}
 			else if(new Piece.adjLoc(mov.getStart()) != previousSpot) {
 				throw new BadMoveException("Bad move at [" + mov.getStart().row + ", " + mov.getStart().column + "] -> Wrong starting spot");
@@ -211,7 +193,7 @@ public class Board {
 			iterateHorizontal = 1;
 		}
 		
-		if(state == AttackState.WITHDRAWING) {
+		if(mov.getState() == AttackState.WITHDRAWING) {
 			iterateVertical *= -1;
 			iterateHorizontal *= -1;
 		}
@@ -219,7 +201,7 @@ public class Board {
 		//Keeps track of which piece we are looking at
 		int nextRow;
 		int nextColumn;
-		if(state == AttackState.ADVANCING) {
+		if(mov.getState() == AttackState.ADVANCING) {
 			nextRow = mov.getEnd().row;
 			nextColumn = mov.getEnd().column;
 		}
@@ -229,7 +211,7 @@ public class Board {
 		}
 		
 		ArrayList<Piece> ret = new ArrayList<Piece>();
-		System.out.println("" +state + " " + mov.getDirection());
+		System.out.println("" + mov.getState() + " " + mov.getDirection());
 		try {
 			while(true) {
 				nextRow += iterateVertical;
@@ -267,6 +249,22 @@ public class Board {
 		//Move the actual piece
 		theBoard[mov.getEnd().row][mov.getEnd().column].setColor(mov.getStart().getColor());
 		theBoard[mov.getStart().row][mov.getStart().column].setColor(Color.GRAY);
+		
+		if(moves == MAXMOVES) {
+			String winner = "";
+			if(whites == 0) {
+				if(blacks == 0) {
+					winner = "tie";
+				}
+				else {
+					winner = "black";
+				}
+			}
+			else {
+				winner = "white";
+			}
+			throw new GameOverException(winner);
+		}
 		
 		return ret;
 	}
@@ -398,11 +396,11 @@ public class Board {
 					advance = theBoard[start.row + rowAdv][start.column + colAdv];
 					withdraw = theBoard[start.row + rowWd][start.column + colWd];
 					if(advance.getColor() != move.getColor() && !advance.isEmpty()) {
-						Move newMove = new Move(start, end, true, true);
+						Move newMove = new Move(start, end, AttackState.ADVANCING);
 						capture.add(newMove);
 					}
 					if(withdraw.getColor() != move.getColor() && !withdraw.isEmpty()) {
-						Move newMove = new Move(start, end, false, true);
+						Move newMove = new Move(start, end, AttackState.WITHDRAWING);
 						capture.add(newMove);
 					}
 				}
@@ -410,7 +408,7 @@ public class Board {
 				else if(Piece.isValidSpace(start.row + rowAdv, start.column + colAdv)) {
 					advance = theBoard[start.row + rowAdv][start.column + colAdv];
 					if(advance.getColor() != move.getColor() && !advance.isEmpty()) {
-						Move newMove = new Move(start, end, false, true);
+						Move newMove = new Move(start, end, AttackState.WITHDRAWING);
 						capture.add(newMove);
 					}
 				}
@@ -418,13 +416,13 @@ public class Board {
 				else if(Piece.isValidSpace(start.row + rowWd, start.column + colWd)) {
 					withdraw = theBoard[start.row + rowWd][start.column + colWd];
 					if(withdraw.getColor() != move.getColor() && !withdraw.isEmpty()) {
-						Move newMove = new Move(start, end, true, true);
+						Move newMove = new Move(start, end, AttackState.ADVANCING);
 						capture.add(newMove);
 					}
 				}
 				// If no captures have been found, a paika is possible
 				else if(capture.isEmpty()) {
-						Move newMove = new Move(start, end, false, false);
+						Move newMove = new Move(start, end, AttackState.NIETHER);
 						paika.add(newMove);
 				}
 			}
@@ -510,30 +508,30 @@ public class Board {
 								advance = theBoard[piece.row + rowAdv][piece.column + colAdv];
 								withdraw = theBoard[piece.row + rowWd][piece.column + colWd];
 								if(advance.getColor() != move.getColor() && !advance.isEmpty()) {
-									Move newMove = new Move(piece, end, true, true);
+									Move newMove = new Move(piece, end, AttackState.ADVANCING);
 									capture.add(newMove);
 								}
 								if(withdraw.getColor() != move.getColor() && !withdraw.isEmpty()) {
-									Move newMove = new Move(piece, end, false, true);
+									Move newMove = new Move(piece, end, AttackState.WITHDRAWING);
 									capture.add(newMove);
 								}
 							}
 							else if(Piece.isValidSpace(piece.row + rowAdv, piece.column + colAdv)) {
 								advance = theBoard[piece.row + rowAdv][piece.column + colAdv];
 								if(advance.getColor() != move.getColor() && !advance.isEmpty()) {
-									Move newMove = new Move(piece, end, false, true);
+									Move newMove = new Move(piece, end, AttackState.WITHDRAWING);
 									capture.add(newMove);
 								}
 							}
 							else if(Piece.isValidSpace(piece.row + rowWd, piece.column + colWd)) {
 								withdraw = theBoard[piece.row + rowWd][piece.column + colWd];
 								if(withdraw.getColor() != move.getColor() && !withdraw.isEmpty()) {
-									Move newMove = new Move(piece, end, true, true);
+									Move newMove = new Move(piece, end, AttackState.ADVANCING);
 									capture.add(newMove);
 								}
 							}
 							else if(capture.isEmpty()) {
-									Move newMove = new Move(piece, end, false, false);
+									Move newMove = new Move(piece, end, AttackState.NIETHER);
 									paika.add(newMove);
 							}
 						}
