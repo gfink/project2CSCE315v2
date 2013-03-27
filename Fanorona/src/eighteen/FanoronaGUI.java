@@ -22,11 +22,13 @@ public class FanoronaGUI extends JFrame {
 	//TODO end move button
 	//TODO add to a tool bar or button bar containing buttons for help, 
 			//end move, attack/retreat, game setup options, connect to opponent, sacrifice piece
-	JButton helpb; 
+	JButton helpb;
+	JPanel topRow = new JPanel();	
 	Board board; //contains the array of pieces and board management functions
 	DrawnPiece[][] gamePieces;
 	DrawnPiece prevMoveDrawn;
 	Piece prevMove;
+	AttackState userPickState;
 	JLabel blackPieces,whitePieces,movesMade,utilityVal,currentTurn;
 	private String playerTurn = "WHITE";
 	Container game = getContentPane();
@@ -107,19 +109,57 @@ public class FanoronaGUI extends JFrame {
                  helpgui.setVisible(true);
              }
          });
-         game.add(helpb,BorderLayout.NORTH);
+         topRow.add(helpb);
+    }
+    public void makeAttackWithdrawButton()
+    {
+    	 JButton attack = new JButton("Attack");
+    	 JButton withdraw = new JButton("Withdraw");
+    	 attack.setBounds(50,60,80,30);
+    	 withdraw.setBounds(50,60,80,30);
+         attack.addActionListener(new ActionListener() {
+             public void actionPerformed(ActionEvent event) {
+            	 //if(userPickState != )
+            	 //{
+            		 
+            	 //}
+             }
+         });
+         withdraw.addActionListener(new ActionListener() {
+             public void actionPerformed(ActionEvent event) {
+
+             }
+         });
+         topRow.add(attack);
+         topRow.add(withdraw);
     }
     public void makeMoveCancelButton()
     {
-    	 helpb = new JButton("Cancel Move");
-         helpb.setBounds(50,60,80,30);
-         helpb.addActionListener(new ActionListener() {
+    	 JButton cancelMove = new JButton("Cancel Move");
+    	 cancelMove.setBounds(50,60,80,30);
+    	 cancelMove.addActionListener(new ActionListener() {
              public void actionPerformed(ActionEvent event) {
             	 isMoveState2 = false;
             	 resetPrevMove();
              }
          });
-         game.add(helpb,BorderLayout.NORTH);
+         topRow.add(cancelMove);
+    }
+    public void makeEndTurnButton()
+    {
+    	 JButton EndTurn = new JButton("End Turn");
+    	 EndTurn.setBounds(50,60,80,30);
+    	 EndTurn.addActionListener(new ActionListener() {
+             public void actionPerformed(ActionEvent event) {
+            	 endTurn();
+             }
+         });
+         topRow.add(EndTurn);
+    }
+    public void endTurn()
+    {
+		changeTurn();//for the gui, not in the board
+		board.switchTurn();//for the board in the code
     }
     public void resetPrevMove()
     {
@@ -158,6 +198,7 @@ public class FanoronaGUI extends JFrame {
     }
     public FanoronaGUI() {
     	game.setLayout(new BorderLayout());
+    	topRow.setLayout(new FlowLayout());
     	try {
 			board = new Board(5,13);
 		} catch (BadBoardException e) {
@@ -165,13 +206,16 @@ public class FanoronaGUI extends JFrame {
 		}//TODO eventually need user input here
     	gamePieces = new DrawnPiece[Board.ROWS][Board.COLUMNS];
     	prevMoveDrawn = null;
-    	
+    	userPickState = null;
     	makePieces();
     	//makeGrid();
-    	//makeHelpButton();
+    	makeAttackWithdrawButton();
+    	makeHelpButton();
     	makeInfoPanel();
     	makeMoveCancelButton();
+    	makeEndTurnButton();
     	makePieceListeners();
+    	game.add(topRow, BorderLayout.NORTH);
     	setSize(500,350);
         setTitle("Fanorona");
         
@@ -189,7 +233,7 @@ public class FanoronaGUI extends JFrame {
     	}
     	public void actionPerformed(ActionEvent e)
     	{
-    		//TODO check if chain
+    		//TODO check if chain, and if so function correctly
     		//TODO prevent turn if not correct player
     		DrawnPiece gamePiece = (DrawnPiece) e.getSource();
     		Piece pieceClicked = board.theBoard[gamePiece.xLoc][gamePiece.yLoc];
@@ -239,7 +283,8 @@ public class FanoronaGUI extends JFrame {
 		    	    	prevMoveDrawn = null;
 		    	    	prevMove = null;
 		    			isMoveState2 = false;
-		    			changeTurn();
+		    			if(!board.chain)
+		    				changeTurn();//the board will automatically change the turn, the gui needs to be updated manually though
 		    			runAIMove(moveToPlay);
 		    			updateInfoPanel();
 	    			}
@@ -255,17 +300,23 @@ public class FanoronaGUI extends JFrame {
     		}
     		else if (gamePiece.pColor !=Color.YELLOW && gamePiece.pColor != Color.GRAY && !isMoveState2)
     		{
-    			
+    			try
+    			{
     			//highlight all available moves, if not making a move, and if the piece clicked isn't gray
     			//TODO THIS NEEDS TO TAKE INTO ACCOUNT OTHER CAPTURES ON THE BOARD EVENTUALLY
+    			//getValidMoves(Color), returns a list of moves, List<Move>
+    			//using the start location given by the click, iterate through List<Move> to find all available moves
+    			//using the clicked piece to start
+    			//then color those
+    			ArrayList<Move> validMoves = board.getValidMoves(board.turn);
     			boolean ColorChanged = false;
-	    		for(adjLoc p : pieceClicked.adjacentLocations)
+	    		for(Move m : validMoves)
 	    		{
-	    			if (gamePieces[p.row][p.column].pColor == Color.GRAY)
+	    			if (m.start == pieceClicked)
 	    			{
 	    				ColorChanged = true;
-	    				gamePieces[p.row][p.column].pColor = Color.YELLOW;
-	    				gamePieces[p.row][p.column].repaint();
+	    				gamePieces[m.end.row][m.end.column].pColor = Color.YELLOW;
+	    				gamePieces[m.end.row][m.end.column].repaint();
 	    			}
 	    		}
 	    		if(ColorChanged)
@@ -275,6 +326,12 @@ public class FanoronaGUI extends JFrame {
 	    			isMoveState2 = true;
 	    		}
 	    		System.out.print("Clicked x:" + gamePiece.xLoc+" y:"+gamePiece.yLoc+"\n");
+    			}
+    			catch (BadMoveException e1) 
+    			{
+					e1.printStackTrace();
+					//TODO something about the GameOverException
+				}
     		}		
     	}
     }

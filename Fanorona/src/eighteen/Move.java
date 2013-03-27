@@ -5,8 +5,8 @@ import java.awt.Color;
 import eighteen.Board.BadMoveException;
 
 public class Move {
-	private Piece start;
-	private Piece.adjLoc end;
+	public Piece start;
+	public Piece.adjLoc end;
 	private Direction direction;
 	AttackState state;
 	public Move() {}
