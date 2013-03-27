@@ -234,9 +234,12 @@ public class FanoronaGUI extends JFrame {
 		    			updateInfoPanel();
 	    			}
 				} 
-    			catch (BadMoveException | GameOverException e1) 
-    			{
+    			catch (BadMoveException e1) {
 					e1.printStackTrace();
+					//TODO something about the GameOverException
+				}
+    			catch (GameOverException e2) {
+					e2.printStackTrace();
 					//TODO something about the GameOverException
 				}
     		}

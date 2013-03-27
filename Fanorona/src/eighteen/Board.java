@@ -134,6 +134,7 @@ public class Board {
 	
 	//Returns whether the game is over
 	public ArrayList<Piece> move(Move mov) throws BadMoveException, GameOverException {
+		//TODO: Check removal of pieces
 		if(!isValidMove(mov)) {
 			throw new BadMoveException("Bad move at [" + mov.getStart().row + ", " + mov.getStart().column + "] to [" + mov.getEnd().row + ", " + mov.getEnd().column + "]");
 		}
@@ -149,11 +150,11 @@ public class Board {
 				chainMoves = new ArrayList<Move>();
 				moves++;
 			}
-			else if(new Piece.adjLoc(mov.getStart()) != previousSpot) {
-				throw new BadMoveException("Bad move at [" + mov.getStart().row + ", " + mov.getStart().column + "] -> Wrong starting spot");
-			}
 			else if(previousLocations.contains(mov.getEnd())) {
 				throw new BadMoveException("Bad move at [" + mov.getStart().row + ", " + mov.getStart().column + "] -> That space has already been moved to in this chain");
+			}
+			else if(new Piece.adjLoc(mov.getStart()) != previousSpot) {
+				throw new BadMoveException("Bad move at [" + mov.getStart().row + ", " + mov.getStart().column + "] -> Wrong starting spot");
 			}
 			else if(previousDirection == mov.getDirection()) {
 				throw new BadMoveException("Bad move at [" + mov.getStart().row + ", " + mov.getStart().column + "] -> Same direction as previous move in chain");
