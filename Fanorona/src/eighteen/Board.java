@@ -3,7 +3,6 @@ package eighteen;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 import eighteen.Piece.adjLoc;
 
@@ -68,7 +67,9 @@ public class Board {
 	public Board(Board b) {
 		theBoard = new Piece[ROWS][COLUMNS];
 		for(int i = 0; i < ROWS; i++) {
-			System.arraycopy(b.theBoard, 0, theBoard, 0, COLUMNS);
+			for(int j = 0; j < COLUMNS; j++) {
+				theBoard[i][j] = new Piece(b.theBoard[i][j]);
+			}
 		}
 		blacks = b.blacks;
 		whites = b.whites;
