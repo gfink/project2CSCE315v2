@@ -6,21 +6,22 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import eighteen.Board.BadBoardException;
 import eighteen.Board.BadMoveException;
+import eighteen.Board.GameOverException;
 import eighteen.Piece.adjLoc;
 
 public class FanoronaGUI extends JFrame {
 	//TODO if choice between pieces, pick attacking or retreating
 	//TODO end move button
 	//TODO add to a tool bar or button bar containing buttons for help, 
-			//end move, attack/retreat, game setup options, connect to opponent
+			//end move, attack/retreat, game setup options, connect to opponent, sacrifice piece
 	JButton helpb; 
 	Board board; //contains the array of pieces and board management functions
 	DrawnPiece[][] gamePieces;
@@ -74,10 +75,10 @@ public class FanoronaGUI extends JFrame {
     public void makePieces()
     {
     	JPanel jBoard = new JPanel();
-    	jBoard.setLayout(new GridLayout(board.ROWS,board.COLUMNS,15,15));
-        for(int x= 0;x<board.ROWS;x++)
+    	jBoard.setLayout(new GridLayout(Board.ROWS,Board.COLUMNS,15,15));
+        for(int x= 0;x<Board.ROWS;x++)
         {
-        	for(int y = 0; y<board.COLUMNS; y++)
+        	for(int y = 0; y<Board.COLUMNS; y++)
         	{
         		if(board.theBoard[x][y].getColor() == Color.BLACK)
         		{
@@ -142,30 +143,32 @@ public class FanoronaGUI extends JFrame {
     public void makePieceListeners()
     {
     	clicked = new PieceListener(); 
-		for(int x= 0;x<board.ROWS;x++)
+		for(int x= 0;x<Board.ROWS;x++)
         {
-        	for(int y = 0; y<board.COLUMNS; y++)
+        	for(int y = 0; y<Board.COLUMNS; y++)
         	{
 			gamePieces[x][y].addActionListener(clicked);
         	}
 		}
     }
-    public void makeBoard()
+    public void makeGrid()
     {
-    	/*
-    	 * need to know the logic behind options to move pieces
-    	 * then just draw a few lines to show options for moves
-    	 */
-    	//this will make the diagonals
+    	GameGrid grid = new GameGrid(Board.ROWS, Board.COLUMNS);
+    	game.add(grid,BorderLayout.CENTER);
     }
     public FanoronaGUI() {
     	game.setLayout(new BorderLayout());
-    	board = new Board(5,13);//eventually need user input here
+    	try {
+			board = new Board(5,13);
+		} catch (BadBoardException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}//TODO eventually need user input here
     	gamePieces = new DrawnPiece[Board.ROWS][Board.COLUMNS];
-    	prevMoveDrawn = new DrawnPiece(0,0,Color.GRAY);
+    	prevMoveDrawn = null;
     	
     	makePieces();
-    	makeBoard();
+    	//makeGrid();
     	//makeHelpButton();
     	makeInfoPanel();
     	makeMoveCancelButton();
@@ -189,7 +192,10 @@ public class FanoronaGUI extends JFrame {
     			try
     			{
 	    			Move moveToPlay = null;
-					moveToPlay = new Move(prevMove, new Piece.adjLoc(pieceClicked), true, true);
+					moveToPlay = new Move(prevMove, new Piece.adjLoc(pieceClicked), AttackState.NIETHER);
+					//now constructed, check move if attacking or withdrawing
+					//prompt user if needed
+					//then set the value externally
 	    			if (board.isValidMove(moveToPlay))
 	    			{
 		    			//make the point clicked the color of the previous point clicked
@@ -216,29 +222,29 @@ public class FanoronaGUI extends JFrame {
 		    					gamePieces[p.row][p.column].repaint();
 		    			}
 		    			
-		    	    	System.out.print("Moved to x:" + gamePiece.xLoc+" y:"+gamePiece.yLoc + "from x:" +prevMove.column +" y:"+prevMove.row +"\n" );
+		    	    	System.out.print("Moved to x:" + gamePiece.yLoc+" y:"+gamePiece.xLoc + " from x:" +prevMove.column +" y:"+prevMove.row +"\n" );
 		    	    	//set up for next turn
 		    	    	prevMoveDrawn = null;
 		    	    	prevMove = null;
 		    			isMoveState2 = false;
 		    			changeTurn();
-		    			//check if game over by win
-		    			//ask for ai/opponent move
-		    			//check if game over by win or by too many moves
+		    			//TODO check if game over by win
+		    			//TODO ask for ai/opponent move
+		    			//TODO check if game over by win or by too many moves
 		    			updateInfoPanel();
 	    			}
 				} 
-    			catch (BadMoveException e1) 
+    			catch (BadMoveException | GameOverException e1) 
     			{
-					// TODO Auto-generated catch block
 					e1.printStackTrace();
+					//TODO something about the GameOverException
 				}
     		}
     		else if (gamePiece.pColor !=Color.YELLOW && gamePiece.pColor != Color.GRAY && !isMoveState2)
     		{
     			
     			//highlight all available moves, if not making a move, and if the piece clicked isn't gray
-    			//THIS NEEDS TO TAKE INTO ACCOUNT OTHER CAPTURES ON THE BOARD EVENTUALLY
+    			//TODO THIS NEEDS TO TAKE INTO ACCOUNT OTHER CAPTURES ON THE BOARD EVENTUALLY
     			boolean ColorChanged = false;
 	    		for(adjLoc p : pieceClicked.adjacentLocations)
 	    		{
@@ -248,7 +254,6 @@ public class FanoronaGUI extends JFrame {
 	    				gamePieces[p.row][p.column].pColor = Color.YELLOW;
 	    				gamePieces[p.row][p.column].repaint();
 	    			}
-	    			//gamePieces[prevMoveDrawn.xLoc][prevMoveDrawn.yLoc].pColor = Color.GRAY;
 	    		}
 	    		if(ColorChanged)
 	    		{
@@ -257,13 +262,9 @@ public class FanoronaGUI extends JFrame {
 	    			isMoveState2 = true;
 	    		}
 	    		System.out.print("Clicked x:" + gamePiece.xLoc+" y:"+gamePiece.yLoc+"\n");
-    		}
-    		
+    		}	
     		//System.out.print("Clicked x:" + gamePiece.xLoc+" y:"+gamePiece.yLoc+"\n");
-    		
-    		//WAIT FOR AI OR OPPONENT MOVE HERE
-    		//System.out.print(isMoveState2 +" \n");
-    		
+    		//System.out.print(isMoveState2 +" \n");	
     	}
     }
     
