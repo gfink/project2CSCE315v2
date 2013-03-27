@@ -408,7 +408,7 @@ public class Board {
 				else if(Piece.isValidSpace(start.row + rowAdv, start.column + colAdv)) {
 					advance = theBoard[start.row + rowAdv][start.column + colAdv];
 					if(advance.getColor() != move.getColor() && !advance.isEmpty()) {
-						Move newMove = new Move(start, end, AttackState.WITHDRAWING);
+						Move newMove = new Move(start, end, AttackState.ADVANCING);
 						capture.add(newMove);
 					}
 				}
@@ -416,7 +416,7 @@ public class Board {
 				else if(Piece.isValidSpace(start.row + rowWd, start.column + colWd)) {
 					withdraw = theBoard[start.row + rowWd][start.column + colWd];
 					if(withdraw.getColor() != move.getColor() && !withdraw.isEmpty()) {
-						Move newMove = new Move(start, end, AttackState.ADVANCING);
+						Move newMove = new Move(start, end, AttackState.WITHDRAWING);
 						capture.add(newMove);
 					}
 				}
@@ -519,14 +519,14 @@ public class Board {
 							else if(Piece.isValidSpace(piece.row + rowAdv, piece.column + colAdv)) {
 								advance = theBoard[piece.row + rowAdv][piece.column + colAdv];
 								if(advance.getColor() != move.getColor() && !advance.isEmpty()) {
-									Move newMove = new Move(piece, end, AttackState.WITHDRAWING);
+									Move newMove = new Move(piece, end, AttackState.ADVANCING);
 									capture.add(newMove);
 								}
 							}
 							else if(Piece.isValidSpace(piece.row + rowWd, piece.column + colWd)) {
 								withdraw = theBoard[piece.row + rowWd][piece.column + colWd];
 								if(withdraw.getColor() != move.getColor() && !withdraw.isEmpty()) {
-									Move newMove = new Move(piece, end, AttackState.ADVANCING);
+									Move newMove = new Move(piece, end, AttackState.WITHDRAWING);
 									capture.add(newMove);
 								}
 							}
