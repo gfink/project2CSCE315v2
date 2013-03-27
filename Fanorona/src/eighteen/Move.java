@@ -89,4 +89,16 @@ public class Move {
 	public void setState(AttackState state) {
 		this.state = state;
 	}
+	
+	public boolean equals(Move moveToCompare) {
+		if(!start.equals(moveToCompare.getStart()))
+			return false;
+		if(!end.equals(moveToCompare.getEnd()))
+			return false;
+		if(state != moveToCompare.getState())
+			return false;
+		if(direction != moveToCompare.getDirection())
+			return false;
+		return true;
+	}
 }
