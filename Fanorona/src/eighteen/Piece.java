@@ -14,6 +14,12 @@ public class Piece {
 			row = piece.row;
 			column = piece.column;
 		}
+		public boolean equals(adjLoc b) {
+			if(row == b.row && column == b.column) {
+				return true;
+			}
+			return false;
+		}
 	}
 	private enum PieceState{
 		BLACK, WHITE, EMPTY

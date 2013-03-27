@@ -140,6 +140,7 @@ public class Board {
 	}
 	
 	public Color switchTurn() {
+		chain = false;
 		turn = oppositeColor(turn);
 		return turn;
 	}
@@ -161,18 +162,19 @@ public class Board {
 			chainMoves = new ArrayList<Move>();
 			moves++;
 		}
+		chain = isChain;
 		if(chain) {
 			if(previousLocations.contains(mov.getEnd())) {
 				throw new BadMoveException("Bad move at [" + mov.getStart().row + ", " + mov.getStart().column + "] -> That space has already been moved to in this chain");
 			}
 			else if(new Piece.adjLoc(mov.getStart()) != previousSpot) {
+				System.out.println("Previous spot = [" + previousSpot.row + " ," + previousSpot.column + "]");
 				throw new BadMoveException("Bad move at [" + mov.getStart().row + ", " + mov.getStart().column + "] -> Wrong starting spot");
 			}
 			else if(previousDirection == mov.getDirection()) {
 				throw new BadMoveException("Bad move at [" + mov.getStart().row + ", " + mov.getStart().column + "] -> Same direction as previous move in chain");
 			}
 		}
-		chain = isChain;
 		
 		int iterateVertical = 0;
 		int iterateHorizontal = 0;
@@ -255,10 +257,11 @@ public class Board {
 		}
 		finally {}
 		chainColor = mov.getColor();
-		previousSpot = new Piece.adjLoc(mov.getStart());
+		previousSpot = mov.getEnd();
 		previousDirection = mov.getDirection();
 		previousLocations.add(new Piece.adjLoc(mov.getStart()));
 		chainMoves.add(mov);
+		chain = true;
 		
 		//Done later to not mess with mov.getColor
 		//Move the actual piece
