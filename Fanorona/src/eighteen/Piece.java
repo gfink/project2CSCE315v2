@@ -44,10 +44,12 @@ public class Piece {
 		if(c == Color.BLACK)
 		{
 			pState=PieceState.BLACK;
+			isEmpty = false;
 		}
 		else if(c == Color.WHITE)
 		{
 			pState=PieceState.WHITE;
+			isEmpty = false;
 		}
 		else if(c == Color.GRAY)
 		{

@@ -353,8 +353,9 @@ public class Board {
 		Piece start = getPiece(x,y);
 		
 		// In case the point doesn't have a piece there
-		if(start.isEmpty())
+		if(start.isEmpty()) {
 			return capture;
+		}
 		
 		// Local move to get the direction of each potential move
 		Move move = new Move();
