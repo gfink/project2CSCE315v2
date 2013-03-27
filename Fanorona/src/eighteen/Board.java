@@ -4,6 +4,8 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 
+import eighteen.Piece.adjLoc;
+
 public class Board {
 
 	public static class BadMoveException extends Exception {
@@ -120,7 +122,7 @@ public class Board {
 			}
 		}
 		moves = 0;
-		chain = true;
+		chain = false;
 		//The first mover is white, so we want it to start a new chain, thus it is BLACK
 		chainColor = Color.BLACK;
 		//0,0 will never be a problem for a first move in the middle, which will reset it
@@ -137,6 +139,11 @@ public class Board {
 		turn = Color.WHITE;
 	}
 	
+	public Color switchTurn() {
+		turn = oppositeColor(turn);
+		return turn;
+	}
+	
 	//Returns whether the game is over
 	public ArrayList<Piece> move(Move mov) throws BadMoveException, GameOverException {
 		//TODO: Check removal of pieces
@@ -147,15 +154,15 @@ public class Board {
 		boolean isChain = true;
 		
 		//Checks for errors in chaining
+		if(mov.getStart().getColor() != chainColor) {
+			isChain = false;
+			previousLocations = new ArrayList<Piece.adjLoc>();
+			chainColor = mov.getStart().getColor();
+			chainMoves = new ArrayList<Move>();
+			moves++;
+		}
 		if(chain) {
-			if(mov.getStart().getColor() != chainColor) {
-				isChain = false;
-				previousLocations = new ArrayList<Piece.adjLoc>();
-				chainColor = mov.getStart().getColor();
-				chainMoves = new ArrayList<Move>();
-				moves++;
-			}
-			else if(previousLocations.contains(mov.getEnd())) {
+			if(previousLocations.contains(mov.getEnd())) {
 				throw new BadMoveException("Bad move at [" + mov.getStart().row + ", " + mov.getStart().column + "] -> That space has already been moved to in this chain");
 			}
 			else if(new Piece.adjLoc(mov.getStart()) != previousSpot) {
@@ -258,6 +265,10 @@ public class Board {
 		theBoard[mov.getEnd().row][mov.getEnd().column].setColor(mov.getStart().getColor());
 		theBoard[mov.getStart().row][mov.getStart().column].setColor(Color.GRAY);
 		
+		if(getValidChainMoves(mov.getEnd()).size() == 0) {
+			switchTurn();
+		}
+		
 		if(moves == MAXMOVES) {
 			String winner = "";
 			if(whites == 0) {
@@ -333,9 +344,12 @@ public class Board {
 	 * (e.g. If a capture is possible at another location on the board,
 	 *       this can still return a paika move)
 	 */
-	public List<Move> getValidMoves(int x, int y) throws BadMoveException {
+	public List<Move> getValidChainMoves(adjLoc place) throws BadMoveException {
+		return getValidChainMoves(place.row, place.column);
+	}
+	
+	public List<Move> getValidChainMoves(int x, int y) throws BadMoveException {
 		ArrayList<Move> capture = new ArrayList<Move>();
-		ArrayList<Move> paika = new ArrayList<Move>();
 		Piece start = getPiece(x,y);
 		
 		// In case the point doesn't have a piece there
@@ -347,8 +361,14 @@ public class Board {
 		move.setStart(start);
 		for(Piece.adjLoc end: start.adjacentLocations) {
 			// Updates the direction
+			if(previousLocations.contains(end)) {
+				continue;
+			}
 			move.setEnd(end);
 			move.updateDirection();
+			if(move.getDirection() == previousDirection) {
+				continue;
+			}
 			int rowAdv = 0;
 			int rowWd = 0;
 			int colAdv = 0;
@@ -436,17 +456,9 @@ public class Board {
 						capture.add(newMove);
 					}
 				}
-				// If no captures have been found, a paika is possible
-				else if(capture.isEmpty()) {
-						Move newMove = new Move(start, end, AttackState.NIETHER);
-						paika.add(newMove);
-				}
 			}
 		}
-		if(!capture.isEmpty())
-			return capture;
-		else
-			return paika;
+		return capture;
 	}
 	
 	// Gets valid moves for a specific color on the entire board
