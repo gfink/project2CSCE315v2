@@ -97,6 +97,10 @@ public class Piece {
 		return false;
 	}
 	
+	public static boolean isValidSpace(adjLoc location) {
+		return isValidSpace(location.row, location.column);
+	}
+	
 	public void adjacentLocations() 
 	{
 		if((row + column) % 2 == 0) {

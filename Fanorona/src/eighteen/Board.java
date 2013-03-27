@@ -75,7 +75,7 @@ public class Board {
 	//}
 	
 	public double Utility() {
-		double ret = whites / (blacks + whites);
+		double ret = ((double)whites) / ((double)(blacks + whites));
 		ret *= 200;
 		ret -= 100;
 		return ret;
@@ -107,9 +107,9 @@ public class Board {
 			}
 		}
 		moves = 0;
-		chain = false;
-		//The first mover is white
-		chainColor = Color.WHITE;
+		chain = true;
+		//The first mover is white, so we want it to start a new chain, thus it is BLACK
+		chainColor = Color.BLACK;
 		//0,0 will never be a problem for a first move in the middle, which will reset it
 		previousSpot = new Piece.adjLoc(0, 0);
 		//As white moves first, this will be reset and not be a problem
@@ -123,7 +123,7 @@ public class Board {
 	}
 	
 	//Returns whether the game is over
-	public ArrayList<Piece> move(Move mov) throws BadMoveException {
+	public ArrayList<Piece> move(Move mov, AttackState state) throws BadMoveException {
 		if(!isValidMove(mov)) {
 			throw new BadMoveException("Bad move at [" + mov.getStart().row + ", " + mov.getStart().column + "] to [" + mov.getEnd().row + ", " + mov.getEnd().column + "]");
 		}
@@ -150,10 +150,6 @@ public class Board {
 			}
 		}
 		chain = isChain;
-		
-		//Move the actual piece
-		theBoard[mov.getEnd().row][mov.getEnd().column].setColor(mov.getStart().getColor());
-		theBoard[mov.getStart().row][mov.getStart().column].setColor(Color.GRAY);
 		
 		int iterateVertical = 0;
 		int iterateHorizontal = 0;
@@ -187,7 +183,7 @@ public class Board {
 			iterateHorizontal = 1;
 		}
 		
-		if(!mov.getAdvancing()) {
+		if(state == AttackState.WITHDRAWING) {
 			iterateVertical *= -1;
 			iterateHorizontal *= -1;
 		}
@@ -195,7 +191,7 @@ public class Board {
 		//Keeps track of which piece we are looking at
 		int nextRow;
 		int nextColumn;
-		if(mov.getAdvancing()) {
+		if(state == AttackState.ADVANCING) {
 			nextRow = mov.getEnd().row;
 			nextColumn = mov.getEnd().column;
 		}
@@ -205,14 +201,23 @@ public class Board {
 		}
 		
 		ArrayList<Piece> ret = new ArrayList<Piece>();
-		
+		System.out.println("" +state + " " + mov.getDirection());
 		try {
 			while(true) {
-				nextRow += iterateHorizontal;
-				nextColumn += iterateVertical;
-				if(theBoard[nextRow][nextColumn].getColor() != oppositeColor(mov.getColor())) {
+				nextRow += iterateVertical;
+				nextColumn += iterateHorizontal;
+				System.out.println("" + nextRow + ", " + nextColumn);
+				if(!Piece.isValidSpace(nextRow, nextColumn)) {
+					System.out.println("Broke due to invalid space");
 					break;
 				}
+				if(theBoard[nextRow][nextColumn].getColor() != oppositeColor(mov.getColor())) {
+					System.out.println("Broke because the next isn't the opposite color");
+					System.out.println("Next is " + theBoard[nextRow][nextColumn].getColor());
+					System.out.println("This is " + mov.getColor());
+					break;
+				}
+				System.out.println("Something should die!");
 				theBoard[nextRow][nextColumn].setColor(Color.GRAY);
 				if(chainColor == Color.WHITE) {
 					blacks--;
@@ -229,6 +234,11 @@ public class Board {
 		previousDirection = mov.getDirection();
 		previousLocations.add(new Piece.adjLoc(mov.getStart()));
 		chainMoves.add(mov);
+		
+		//Done later to not mess with mov.getColor
+		//Move the actual piece
+		theBoard[mov.getEnd().row][mov.getEnd().column].setColor(mov.getStart().getColor());
+		theBoard[mov.getStart().row][mov.getStart().column].setColor(Color.GRAY);
 		
 		return ret;
 	}
@@ -249,6 +259,31 @@ public class Board {
 			}
 		}
 		return false;
+	}
+	
+	public AttackState isAdvancing(Move mov) {
+		int iterateVertical = mov.getEnd().row - mov.getStart().row;
+		int iterateHorazontil = mov.getEnd().column - mov.getStart().column;
+		Piece.adjLoc nextSpace = new Piece.adjLoc(mov.getEnd().row + iterateVertical, mov.getEnd().column + iterateHorazontil);
+		Piece.adjLoc previousSpace = new Piece.adjLoc(mov.getStart().row - iterateVertical, mov.getStart().column - iterateHorazontil);
+		if(Piece.isValidSpace(nextSpace)) {
+			if(theBoard[nextSpace.row][nextSpace.column].getColor() == oppositeColor(mov.getColor())) {
+				if(Piece.isValidSpace(previousSpace)) {
+					if(theBoard[previousSpace.row][previousSpace.column].getColor() == oppositeColor(mov.getColor())) {
+						return AttackState.BOTH;
+					}
+				}
+				else {
+					return AttackState.ADVANCING;
+				}
+			}
+		}
+		else if(Piece.isValidSpace(previousSpace)) {
+			if(theBoard[previousSpace.row][previousSpace.column].getColor() == oppositeColor(mov.getColor())) {
+				return AttackState.WITHDRAWING;
+			}
+		}
+		return AttackState.NIETHER;
 	}
 	
 	/* Gets all valid moves for a specific point.

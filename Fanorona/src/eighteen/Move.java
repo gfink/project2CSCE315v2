@@ -8,16 +8,12 @@ public class Move {
 	private Piece start;
 	private Piece.adjLoc end;
 	private Direction direction;
-	private boolean advancing;
-	private boolean attacking;
 	
 	public Move() {}
 	
 	public Move(Piece start, Piece.adjLoc end, boolean isAdvancing, boolean isAttacking) throws BadMoveException {
 		this.start = start;
 		this.end = end;
-		advancing = isAdvancing;
-		attacking = isAttacking;
 		updateDirection();
 	}
 	
@@ -83,13 +79,5 @@ public class Move {
 	}
 	public Direction getDirection() {
 		return direction;
-	}
-	
-	public void setAdvancing(boolean adv) {
-		advancing = adv;
-	}
-	
-	public boolean getAdvancing() {
-		return advancing;
 	}
 }
