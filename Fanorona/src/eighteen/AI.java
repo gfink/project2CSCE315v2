@@ -25,42 +25,68 @@ public class AI {
 		levels++;
 	}
 	
+	public Color getColor() {
+		return myColor;
+	}
+	
 	public void addLevel(TreeNode node) throws BadMoveException {
 		if(!node.hasChildren()) {
-			Color color = Board.oppositeColor(node.getMoves().get(0).getColor());
-			List<Move> validMoves = node.board.getValidMoves(color);
+			Color color = Board.oppositeColor(node.board.chainColor);
+			ArrayList<Move> validMoves = node.board.getValidMoves(color);
+			System.out.println("Found " + validMoves.size() + " moves.");
 			for(Move move: validMoves) {
-				Board tempBoard = new Board(node.board); 
+				Board newBoard = new Board(node.board); 
 				try {
-					tempBoard.move(move);
+					newBoard.move(move);
 				} catch (GameOverException e) {
 					e.printStackTrace();
 				}
-				TreeNode newChild = new TreeNode(tempBoard);
+				TreeNode newChild = new TreeNode(newBoard);
 				node.addChild(newChild);
+				chainCheck(newChild);
+				
 			}
 		}
 		else
 			for(TreeNode child: node.getChildren())
 				addLevel(child);
+		displayChoices();
 	}
 	
-	public void opponentMove(Move move) {
-		TreeNode root = minMaxTree.getRoot();
-		if(!root.hasChildren()) {
-			Board newBoard = root.board;
+	void displayChoices() {
+		for(TreeNode child: minMaxTree.getRoot().getChildren()) {
+		}
+	}
+	
+	public void chainCheck(TreeNode child) throws BadMoveException {
+		Piece.adjLoc previousSpot = child.board.previousSpot;
+		ArrayList<Move> chainMoves = child.board.getValidChainMoves(previousSpot);
+		System.out.println("Found " + chainMoves.size() + " chain possiblities.");
+		for(Move move: chainMoves) {
+			Board newBoard = new Board(child.board);
 			try {
-				ArrayList<Piece> temp = newBoard.move(move);
-				TreeNode newRoot = new TreeNode(newBoard);
-			} catch (BadMoveException e) {
-				e.printStackTrace();
+				newBoard.move(move);
 			} catch (GameOverException e) {
 				e.printStackTrace();
 			}
+			TreeNode newSibling = new TreeNode(newBoard);
+			child.getParent().addChild(newSibling);
+			chainCheck(newSibling);
+		}
+	}
+	
+	public void opponentMove(Board newBoard) {
+		TreeNode root = minMaxTree.getRoot();
+		if(!root.hasChildren()) {
+			System.out.println("AI had no children in tree.");
+			TreeNode newRoot = new TreeNode(newBoard);
+			minMaxTree.setRoot(newRoot);
 		}
 		else {
+			System.out.println("AI had children in tree");
 			for(TreeNode child: root.getChildren()) {
-				if(child.getMoves().equals(move)) {
+				if(child.board.equals(newBoard)) {
+					System.out.println("AI found the move made.");
 					minMaxTree.setRoot(child);
 					break;
 				}
@@ -70,19 +96,30 @@ public class AI {
 	
 	public ArrayList<Move> alphaBetaSearch() throws BadMoveException {
 		TreeNode root = minMaxTree.getRoot();
-		if(!root.hasChildren())
+		if(!root.hasChildren()) {
+			System.out.println("Adding Children");
 			getNewLevel();
-		double value;
-		if (root.getMoves().get(0).getColor() != myColor)
-			value = maxValue(root, -999999, 999999);
+		}
+		double value = 0;
+		if (root.board.chainColor != myColor)
+			if(myColor == Color.WHITE)
+				value = maxValue(root, -999999, 999999);
+			else
+				value = minValue(root, -999999, 999999);
 		else
-			value = minValue(root, -999999, 999999);
+			if(myColor == Color.WHITE)
+				value = minValue(root, -999999, 999999);
+			else
+				value = maxValue(root, -999999, 999999);
+//		System.out.println("Value found: " + value);
 		for(TreeNode child: root.getChildren()) {
+//			System.out.println("Child traversal value: " + child.traversalValue);
 			if(child.traversalValue == value) {
 				minMaxTree.setRoot(child);
 				return child.getMoves();
 			}
 		}
+		System.out.println("No move found");
 		return new ArrayList<Move>();
 	}
 	
@@ -92,6 +129,7 @@ public class AI {
 		
 		for(TreeNode child: state.getChildren()) {
 			alpha = Math.max(alpha,  minValue(child, alpha, beta));
+			child.traversalValue = alpha;
 			if(beta <= alpha) {
 				// Beta cut-off
 				break;
@@ -106,9 +144,10 @@ public class AI {
 		
 		for(TreeNode child: state.getChildren()) {
 			beta = Math.min(beta, maxValue(child, alpha, beta));
+			child.traversalValue = beta;
 			if(beta <= alpha) {
 				// Alpha cut-off
-				return state.traversalValue;
+				break;
 			}
 		}
 		return beta;

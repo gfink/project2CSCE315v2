@@ -41,8 +41,7 @@ public class Piece {
 	}
 	
 	public Piece(Piece a) {
-		this.row = a.row;
-		this.column = a.column;
+		this(a.row, a.column, a.getColor());
 	}
 	public void setColor(Color c)
 	{
@@ -133,7 +132,7 @@ public class Piece {
 	
 	public boolean equals(Piece a)
 	{
-		if(a.row == row && a.column == column)
+		if(a.row == row && a.column == column && a.getColor() == this.getColor())
 			return true;
 		return false;
 	}

@@ -224,19 +224,19 @@ public class Board {
 		else {
 			nextRow = mov.getStart().row;
 			nextColumn = mov.getStart().column;
-			System.out.println("Got here");
+//			System.out.println("Got here");
 		}
 		
 		ArrayList<Piece> ret = new ArrayList<Piece>();
-		System.out.println("" + mov.getState() + " " + mov.getDirection());
+//		System.out.println("" + mov.getState() + " " + mov.getDirection());
 		try {
 			while(true) {
-				System.out.println("" + nextRow + ", " + nextColumn);
+//				System.out.println("" + nextRow + ", " + nextColumn);
 				nextRow += iterateVertical;
 				nextColumn += iterateHorizontal;
-				System.out.println("" + nextRow + ", " + nextColumn);
+//				System.out.println("" + nextRow + ", " + nextColumn);
 				if(!Piece.isValidSpace(nextRow, nextColumn)) {
-					System.out.println("Broke due to invalid space");
+//					System.out.println("Broke due to invalid space");
 					break;
 				}
 				if(theBoard[nextRow][nextColumn].getColor() != oppositeColor(mov.getColor())) {
@@ -245,7 +245,7 @@ public class Board {
 					System.out.println("This is " + mov.getColor());
 					break;
 				}
-				System.out.println("Something should die!");
+//				System.out.println("Something should die!");
 				theBoard[nextRow][nextColumn].setColor(Color.GRAY);
 				if(chainColor == Color.WHITE) {
 					blacks--;
@@ -307,6 +307,7 @@ public class Board {
 				}
 			}
 		}
+		System.out.println("Not valid space or start equaled end.");
 		return false;
 	}
 	
@@ -590,10 +591,12 @@ public class Board {
 		}
 	}
 	
-	public boolean equals(Board b) {
+	
+	/*public boolean equals(Board b) {
 		if(blacks == b.blacks && whites == b.whites && moves == b.moves && chain == b.chain) {
-			if(chainColor.equals(b.chainColor) && previousSpot.equals(b.previousSpot)) {
+			if(chainColor == b.chainColor && previousSpot.equals(b.previousSpot)) {
 				if(previousDirection == b.previousDirection && previousLocations.equals(b.previousLocations)) {
+					System.out.println("Same previousDirection and locations");
 					if(chainMoves.equals(b.chainMoves) && turn.equals(b.turn)) {
 						for(int i = 0; i < ROWS; i++) {
 							if(!Arrays.equals(theBoard[i], b.theBoard[i])) {
@@ -606,5 +609,28 @@ public class Board {
 			}
 		}
 		return false;
+	}*/
+	
+	public boolean equals(Board b) {
+		for(int x=0; x < ROWS; x++) 
+			for(int y=0; y < COLUMNS; y++)
+				if(!theBoard[x][y].equals(b.theBoard[x][y]))
+					return false;
+		return true;
+	}
+	
+	public void print() {
+		for(int x=0; x < Board.ROWS; x++) {
+			for(int y=0; y < Board.COLUMNS; y++) {
+				Color color = theBoard[x][y].getColor();
+				if(color == Color.BLACK)
+					System.out.print("B ");
+				if(color == Color.WHITE)
+					System.out.print("W ");
+				if(color == Color.GRAY)
+					System.out.print("G ");
+			}
+			System.out.println();
+		}
 	}
 }
