@@ -479,8 +479,14 @@ public class Board {
 				if(piece.getColor() == color) {
 					move.setStart(piece);
 					for(Piece.adjLoc end: piece.adjacentLocations) {
+						if(previousLocations.contains(end)) {
+							continue;
+						}
 						move.setEnd(end);
 						move.updateDirection();
+						if(move.getDirection() == previousDirection) {
+							continue;
+						}
 						int rowAdv = 0;
 						int rowWd = 0;
 						int colAdv = 0;
@@ -564,7 +570,7 @@ public class Board {
 									capture.add(newMove);
 								}
 							}
-							else if(capture.isEmpty()) {
+							if(capture.isEmpty()) {
 									Move newMove = new Move(piece, end, AttackState.NIETHER);
 									paika.add(newMove);
 							}
