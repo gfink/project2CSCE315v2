@@ -2,7 +2,6 @@ package eighteen;
 
 import java.awt.Color;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import eighteen.Piece.adjLoc;
 
@@ -144,6 +143,9 @@ public class Board {
 	public Color switchTurn() {
 		chain = false;
 		turn = oppositeColor(turn);
+		//previousLocations = new ArrayList<Piece.adjLoc>();
+		previousDirection = null;
+		//chainMoves = new ArrayList<Move>();
 		return turn;
 	}
 	
@@ -165,10 +167,13 @@ public class Board {
 		}
 		chain = isChain;
 		if(chain) {
-			if(previousLocations.contains(mov.getEnd())) {
-				throw new BadMoveException("Bad move at [" + mov.getStart().row + ", " + mov.getStart().column + "] -> That space has already been moved to in this chain");
+			for(Piece.adjLoc prev: previousLocations) {
+				if(prev.equals(mov.end)) {
+					System.out.println("BAD");
+					throw new BadMoveException("Bad move at [" + mov.getStart().row + ", " + mov.getStart().column + "] -> That space has already been moved to in this chain");
+				}
 			}
-			else if(!(new Piece.adjLoc(mov.getStart())).equals(previousSpot)) {
+			if(!(new Piece.adjLoc(mov.getStart())).equals(previousSpot)) {
 				System.out.println("Previous spot = [" + previousSpot.row + " ," + previousSpot.column + "]");
 				throw new BadMoveException("Bad move at [" + mov.getStart().row + ", " + mov.getStart().column + "] -> Wrong starting spot");
 			}
@@ -224,25 +229,17 @@ public class Board {
 		else {
 			nextRow = mov.getStart().row;
 			nextColumn = mov.getStart().column;
-//			System.out.println("Got here");
 		}
 		
 		ArrayList<Piece> ret = new ArrayList<Piece>();
-//		System.out.println("" + mov.getState() + " " + mov.getDirection());
 		try {
 			while(true) {
-//				System.out.println("" + nextRow + ", " + nextColumn);
 				nextRow += iterateVertical;
 				nextColumn += iterateHorizontal;
-//				System.out.println("" + nextRow + ", " + nextColumn);
 				if(!Piece.isValidSpace(nextRow, nextColumn)) {
-//					System.out.println("Broke due to invalid space");
 					break;
 				}
 				if(theBoard[nextRow][nextColumn].getColor() != oppositeColor(mov.getColor())) {
-					System.out.println("Broke because the next isn't the opposite color");
-					System.out.println("At " + nextRow + " " + nextColumn);
-					System.out.println("This is " + mov.getColor());
 					break;
 				}
 //				System.out.println("Something should die!");
@@ -298,7 +295,11 @@ public class Board {
 			return false;
 		}
 		if(Piece.isValidSpace(mov.getStart().row, mov.getStart().column) && !mov.getStart().equals(mov.getEnd())) {
-			//Checks for Diagonal moves
+			for(Piece.adjLoc prev: previousLocations) {
+				if(prev.equals(mov.getEnd())) {
+					return false;
+				}
+			}
 			for(Piece.adjLoc p : mov.getStart().adjacentLocations)
 			{
 				if(p.column == mov.getEnd().column && p.row == mov.getEnd().row) 
@@ -367,8 +368,10 @@ public class Board {
 		move.setStart(start);
 		for(Piece.adjLoc end: start.adjacentLocations) {
 			// Updates the direction
-			if(previousLocations.contains(end)) {
-				continue;
+			for(Piece.adjLoc previous: previousLocations) {
+				if(previous.equals(end)) {
+					continue;
+				}
 			}
 			move.setEnd(end);
 			move.updateDirection();

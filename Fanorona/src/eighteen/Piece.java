@@ -20,6 +20,9 @@ public class Piece {
 			}
 			return false;
 		}
+		public String toString() {
+			return "[" + row + ", " + column + "]";
+		}
 	}
 	private enum PieceState{
 		BLACK, WHITE, EMPTY

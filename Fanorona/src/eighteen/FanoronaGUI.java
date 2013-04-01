@@ -245,7 +245,7 @@ public class FanoronaGUI extends JFrame {
 				
 	    		for (Move m : AIMoves)
 	    		{
-	    			
+	    			System.out.println(m);
 					gamePieces[m.end.row][m.end.column].pColor = opponent.getColor();
 					gamePieces[m.end.row][m.end.column].repaint();
 					//make the previous point turn gray
@@ -255,6 +255,9 @@ public class FanoronaGUI extends JFrame {
 					ArrayList<Piece> piecesToColor;
 					try {
 						piecesToColor = board.move(m);
+		    			/*for(Piece.adjLoc prev: board.previousLocations) {
+			    			System.out.println(prev);
+		    			}*/
 						for(Piece p : piecesToColor)
 		    			{
 		    					gamePieces[p.row][p.column].pColor = Color.GRAY;

@@ -101,4 +101,8 @@ public class Move {
 			return false;
 		return true;
 	}
+	
+	public String toString() {
+		return "[" + start.row + ", " + start.column + "] to [" + end.row + ", " + end.column + "]";
+	}
 }
