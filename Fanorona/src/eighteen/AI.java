@@ -13,11 +13,13 @@ public class AI {
 	private Tree minMaxTree;
 	private Color myColor;
 	private int levels;
+	private long maxTime;
 	
-	public AI(Color color) {
+	public AI(Color color, long time) {
 		minMaxTree = new Tree();
 		myColor = color;
 		levels = 1;
+		maxTime = time;
 	}
 	
 	// Adds a new level to the Min-Max tree

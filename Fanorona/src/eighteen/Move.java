@@ -106,6 +106,26 @@ public class Move {
 	}
 	
 	public String toString() {
-		return "[" + start.row + ", " + start.column + "] to [" + end.row + ", " + end.column + "]";
+		String type = "";
+		switch(state) {
+		case ADVANCING:
+			type = "A";
+			break;
+		case WITHDRAWING:
+			type = "W";
+			break;
+		case NEITHER:
+			type = "P";
+			break;
+		case SACRIFICE:
+			type = "S";
+			break;
+		}
+		switch(state) {
+		case ADVANCING: case WITHDRAWING: case NEITHER:
+			return type + " " + (start.column + 1) + " " + (start.row + 1) + " " + (end.column + 1) + " " + (end.column + 1);
+		default:
+			return 	type + " " + (start.column + 1) + " " + (start.row + 1);
+		}
 	}
 }

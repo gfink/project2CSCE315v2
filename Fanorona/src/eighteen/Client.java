@@ -1,7 +1,17 @@
 package eighteen;
 
+import java.lang.*;
+import java.awt.Color;
 import java.io.*;
 import java.net.*;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.Scanner;
+import java.util.Timer;
+
+import eighteen.Board.BadBoardException;
+import eighteen.Board.BadMoveException;
+import eighteen.Board.GameOverException;
 
 public class Client {
 	public static void main(String args[]) {

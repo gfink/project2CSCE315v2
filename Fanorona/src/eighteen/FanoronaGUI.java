@@ -199,7 +199,7 @@ public class FanoronaGUI extends JFrame {
 		} catch (BadBoardException e) {
 			e.printStackTrace();
 		}//TODO eventually need user input here
-    	opponent = new AI(Color.BLACK);//TODO eventually need user input here
+    	opponent = new AI(Color.BLACK, 5000);//TODO eventually need user input here
     	try {
 			opponent.getNewLevel();
 		} catch (BadMoveException e) {
