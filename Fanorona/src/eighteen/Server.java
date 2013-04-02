@@ -39,12 +39,13 @@ public class Server {
 			ServerSocket server = null;
 			if(isServer) {
 				System.out.println("Starting");
-				server = new ServerSocket(1225);
+				server = new ServerSocket(4001);
 				System.out.println("Waiting for client");
 				socket = server.accept();
 				System.out.println("Server has connected.");
 			}
 			else {
+				System.out.println("Client connecting");
 				socket = new Socket("Aserver", 4001);
 			}
 			out = new PrintWriter(socket.getOutputStream(), true);
