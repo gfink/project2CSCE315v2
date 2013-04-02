@@ -123,7 +123,7 @@ public class Move {
 		}
 		switch(state) {
 		case ADVANCING: case WITHDRAWING: case NEITHER:
-			return type + " " + (start.column + 1) + " " + (start.row + 1) + " " + (end.column + 1) + " " + (end.column + 1);
+			return type + " " + (start.column + 1) + " " + (start.row + 1) + " " + (end.column + 1) + " " + (end.row + 1);
 		default:
 			return 	type + " " + (start.column + 1) + " " + (start.row + 1);
 		}

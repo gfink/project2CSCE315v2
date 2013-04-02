@@ -6,6 +6,10 @@ import eighteen.Board.GameOverException;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class AI {
 	// Will need to implement Thread at some point in the future
@@ -14,15 +18,31 @@ public class AI {
 	private Color myColor;
 	private int levels;
 	private long maxTime;
+	Timer timer;
 	
 	public AI(Color color, long time) {
 		minMaxTree = new Tree();
 		myColor = color;
 		levels = 1;
 		maxTime = time;
+		timer = new Timer();
+		timer.schedule(new TimerTask() {
+			public void run() {
+				try {
+					ArrayList<Move> moves = alphaBetaSearch();
+					String serverText = "";
+					for(Move move: moves)
+						serverText += (move.toString() + " ");
+					System.out.println(serverText);
+				} catch (BadMoveException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}, maxTime);
 	}
 	
-	// Adds a new level to the Min-Max tree
+	// Adds a new level to the MiniMax tree
 	public void getNewLevel() throws BadMoveException {
 		addLevel(minMaxTree.getRoot());
 		levels++;
