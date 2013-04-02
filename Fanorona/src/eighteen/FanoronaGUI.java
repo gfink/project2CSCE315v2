@@ -47,7 +47,6 @@ public class FanoronaGUI extends JFrame {
     		playerTurn = "BLACK";
     	else
     		playerTurn = "WHITE";
-    	
     }
     
     public void makeInfoPanel() {

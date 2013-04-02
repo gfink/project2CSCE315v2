@@ -592,14 +592,12 @@ public class Board {
 								}
 							}
 							// No capture move are possible
-							else {
-								if(capture.isEmpty()) {
-									paika.add(new Move(piece, end, AttackState.NEITHER));
-//									paika.add(new Move(piece, end, AttackState.SACRIFICE));
-								}
-//								else 
-//									capture.add(new Move(piece, end, AttackState.SACRIFICE));
+							if(capture.isEmpty()) {
+								paika.add(new Move(piece, end, AttackState.NEITHER));
+//								paika.add(new Move(piece, end, AttackState.SACRIFICE));
 							}
+//							else 
+//								capture.add(new Move(piece, end, AttackState.SACRIFICE));
 						}
 					}
 				}

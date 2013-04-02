@@ -49,11 +49,11 @@ public class BoardPanel extends JPanel{
 	    					end.getY() + end.getHeight() / 2);
     			
     			// For / diagonals
-    			endRow = (rows - 1) - i;
-    			endCol = cols - i + 1;
-    			while(endRow < rows - 1) {
-    				endCol--;
-    				endRow++;
+    			endRow = i + rows - 1;
+    			endCol = cols - rows;
+    			while(endRow >= rows) {
+    				endCol++;
+    				endRow--;
     			}
     			start = FanoronaGUI.GUI.gamePieces[i][cols - 1];
     			end = FanoronaGUI.GUI.gamePieces[endRow][endCol];
