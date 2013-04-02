@@ -38,7 +38,7 @@ public class BoardPanel extends JPanel{
     			// For \ diagonals
     			int endRow = i + rows - 1;
     			int endCol = rows - 1;
-    			while(endRow >= rows) {
+    			while(endRow >= rows || endCol >= cols) {
     				endCol--;
     				endRow--;
     			}
@@ -51,7 +51,7 @@ public class BoardPanel extends JPanel{
     			// For / diagonals
     			endRow = i + rows - 1;
     			endCol = cols - rows;
-    			while(endRow >= rows) {
+    			while(endRow >= rows || endCol < 0) {
     				endCol++;
     				endRow--;
     			}
@@ -70,7 +70,7 @@ public class BoardPanel extends JPanel{
     			// For \ Diagonals
     			int endRow = rows - 1;
     			int endCol = i + rows - 1;
-    			while(endCol >= cols) {
+    			while(endCol >= cols || endRow >= rows) {
     				endCol--;
     				endRow--;
     			}
@@ -83,7 +83,7 @@ public class BoardPanel extends JPanel{
     			// For / Diagonals
     			endRow = rows - 1;
     			endCol = i - rows + 1;
-    			while(endCol < 0) {
+    			while(endCol < 0 || endRow >= rows) {
     				endCol++;
     				endRow--;
     			}
