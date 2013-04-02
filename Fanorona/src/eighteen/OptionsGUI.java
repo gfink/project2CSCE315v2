@@ -8,6 +8,7 @@ import java.awt.event.ActionListener;
 
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -22,20 +23,44 @@ public class OptionsGUI extends JFrame{
 	private static final long serialVersionUID = 1L;
 	public static OptionState currentOptions;
 	public static OptionsGUI OGUI;
+	public static int colNdx = 6;
+	public static int rowNdx = 2;
+	private String[] rcOptions = {"1","3","5","7","9","11","13"};
 	public OptionsGUI() {
 		
 		currentOptions = new OptionState();
-		setTitle("Game Options");
+		setTitle("Fanorona Options");
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		JButton okButton = new JButton("OK");
 		JRadioButton white = new JRadioButton("White");
 		JRadioButton black = new JRadioButton("Black");
+		JLabel colorLabel = new JLabel("Player Color");
+		JLabel sizeLabel = new JLabel("Size of Board");
+		JLabel rowLabel = new JLabel("Rows");
+		JLabel colLabel = new JLabel("Column");
 		JPanel radioPanel = new JPanel(new GridLayout(0,1));
+		JPanel sizePanel = new JPanel(new GridLayout(3,2));
+		JComboBox rowList = new JComboBox(rcOptions);
+		JComboBox colList = new JComboBox(rcOptions);
+		if(currentOptions.startColor==Color.WHITE)
+			white.setSelected(true);
+		else
+			black.setSelected(true);
+		rowList.setSelectedIndex(rowNdx);
+		colList.setSelectedIndex(colNdx);
 		ButtonGroup colorOptions = new ButtonGroup();
 		colorOptions.add(white);
 		colorOptions.add(black);
+		radioPanel.add(colorLabel);
 		radioPanel.add(white);
 		radioPanel.add(black);
+		sizePanel.add(sizeLabel);
+		sizePanel.add(new JLabel(""));
+		sizePanel.add(rowLabel);
+		sizePanel.add(rowList);
+		sizePanel.add(colLabel);
+		sizePanel.add(colList);
+		add(sizePanel,BorderLayout.LINE_END);
 		add(radioPanel, BorderLayout.LINE_START);
 		add(okButton, BorderLayout.SOUTH);
 		white.addActionListener(new ActionListener() {
@@ -48,6 +73,20 @@ public class OptionsGUI extends JFrame{
             public void actionPerformed(ActionEvent event) {
             	currentOptions.startColor = Color.BLACK;
             	currentOptions.AIColor = Color.WHITE;
+            }
+        });
+		rowList.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+                JComboBox cb = (JComboBox)event.getSource();
+                String sRow = (String)cb.getSelectedItem();
+                OptionsGUI.currentOptions.oRow = Integer.parseInt(sRow);
+            }
+        });
+		colList.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+                JComboBox cb = (JComboBox)event.getSource();
+                String sCol = (String)cb.getSelectedItem();
+                OptionsGUI.currentOptions.oCol = Integer.parseInt(sCol);
             }
         });
 		okButton.addActionListener(new ActionListener() {
@@ -74,9 +113,11 @@ public class OptionsGUI extends JFrame{
 		setLocationRelativeTo(null);
 	}
 	public class OptionState {
-		Color startColor;
-		Color AIColor;
+		Color startColor = Color.WHITE;
+		Color AIColor = Color.BLACK;
 		OptionState prevOption;
+		int oRow = 5;
+		int oCol = 13;
 		
 		public OptionState()
 		{

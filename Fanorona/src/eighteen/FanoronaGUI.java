@@ -112,6 +112,16 @@ public class FanoronaGUI extends JFrame {
          });
          topRow.add(helpb);
     }
+    public void makeResetButton() {
+	   	JButton options = new JButton("Reset Game");
+	   	options.setBounds(50,60,80,30);
+	   	options.addActionListener(new ActionListener() {
+	        public void actionPerformed(ActionEvent event) {
+	        	FanoronaGUI.GUI = new FanoronaGUI(OptionsGUI.currentOptions);
+	        }
+	    });
+	    topRow.add(options);
+    }
     public void makeGameOptionsButton() {
 	   	JButton options = new JButton("Game Options");
 	   	options.setBounds(50,60,80,30);
@@ -252,12 +262,10 @@ public class FanoronaGUI extends JFrame {
     	game.setLayout(new BorderLayout());
     	topRow.setLayout(new FlowLayout());
     	try {
-			board = new Board(5,13);
-			//TODO use value from options
+			board = new Board(options.oRow,options.oCol);
 		} catch (BadBoardException e) {
 			e.printStackTrace();
 		}
-    	//TODO use value from options
     	opponent = new AI(options.AIColor, 5000);
     	playerColor = options.startColor;
     	try {
@@ -276,6 +284,7 @@ public class FanoronaGUI extends JFrame {
     	makeMoveCancelButton();
     	makeEndTurnButton();
     	makeHelpButton();
+    	makeResetButton();
     	makeGameOptionsButton();
     	makePieceListeners();
     	game.add(topRow, BorderLayout.NORTH);
@@ -284,6 +293,11 @@ public class FanoronaGUI extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         setVisible(true);
+        //if the user is black, run the AI first
+        if(playerColor == Color.BLACK)
+        {
+        	//NEED BETTER SUPPORT FOR THIS
+        }
     }
     
     class PieceListener implements ActionListener {
