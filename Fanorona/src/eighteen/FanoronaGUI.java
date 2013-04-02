@@ -19,26 +19,33 @@ import eighteen.Piece.adjLoc;
 
 public class FanoronaGUI extends JFrame {
 	//TODO if choice between pieces, pick attacking or retreating
-	//TODO end move button
-	//TODO add to a tool bar or button bar containing buttons for game setup options, connect to opponent, sacrifice piece
+	//TODO add to button bar buttons for, sacrifice piece, reset game
+	//Class members for GUI
 	JButton helpb;
 	JPanel topRow = new JPanel();	
-	Board board; //contains the array of pieces and board management functions
+	JLabel blackPieces,whitePieces,movesMade,utilityVal,currentTurn;
+	PieceListener clicked;//given to every piece in a loop
+	Container game = getContentPane();
+	private String playerTurn = "WHITE";
 	DrawnPiece[][] gamePieces;
 	DrawnPiece prevMoveDrawn;
+    public static FanoronaGUI GUI;
+	//Class members for operation of game
+	Board board; //contains the array of pieces and board management functions
 	Piece prevMove;
 	AttackState userPickState;
-	JLabel blackPieces,whitePieces,movesMade,utilityVal,currentTurn;
-	private String playerTurn = "WHITE";
-	Container game = getContentPane();
-	PieceListener clicked;//given to every piece in a loop
 	AI opponent;
 	Color playerColor;
 	Boolean isMoveState2 = false;
-    public static FanoronaGUI GUI;
-    
+	/*
+	 * MAIN IS HERE
+	 */
     public static void main(String[] args) {
-       GUI =  new FanoronaGUI();
+    	//the options GUI will create an instance of this object
+    	OptionsGUI.OGUI = new OptionsGUI();
+    	OptionsGUI.OGUI.setVisible(true);
+    	//GUI =  new FanoronaGUI();
+    	//start a thread waiting for the user to pick server or client, something like that
     }
     
     public void changeTurn() {
@@ -105,7 +112,16 @@ public class FanoronaGUI extends JFrame {
          });
          topRow.add(helpb);
     }
-    
+    public void makeGameOptionsButton() {
+	   	JButton options = new JButton("Game Options");
+	   	options.setBounds(50,60,80,30);
+	   	options.addActionListener(new ActionListener() {
+	        public void actionPerformed(ActionEvent event) {
+	        	OptionsGUI.OGUI.setVisible(true);
+	        }
+	    });
+	    topRow.add(options);
+    }
     public void makeAttackWithdrawButton() {
     	 JButton attack = new JButton("Attack");
     	 JButton withdraw = new JButton("Withdraw");
@@ -228,32 +244,39 @@ public class FanoronaGUI extends JFrame {
         	}
 		}
     }
-    
-    public FanoronaGUI() {
+    public FanoronaGUI()
+    {
+    	//DO NOT CALL THIS EVER
+    }
+    public FanoronaGUI(OptionsGUI.OptionState options) {
     	game.setLayout(new BorderLayout());
     	topRow.setLayout(new FlowLayout());
     	try {
 			board = new Board(5,13);
+			//TODO use value from options
 		} catch (BadBoardException e) {
 			e.printStackTrace();
-		}//TODO eventually need user input here
-    	opponent = new AI(Color.BLACK, 5000);//TODO eventually need user input here
+		}
+    	//TODO use value from options
+    	opponent = new AI(options.AIColor, 5000);
+    	playerColor = options.startColor;
     	try {
 			opponent.getNewLevel();
 		} catch (BadMoveException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-    	playerColor = Color.WHITE;
+    	
     	gamePieces = new DrawnPiece[Board.ROWS][Board.COLUMNS];
     	prevMoveDrawn = null;
     	userPickState = null;
     	makePieces();
     	makeAttackWithdrawButton();
-    	makeHelpButton();
     	makeInfoPanel();
     	makeMoveCancelButton();
     	makeEndTurnButton();
+    	makeHelpButton();
+    	makeGameOptionsButton();
     	makePieceListeners();
     	game.add(topRow, BorderLayout.NORTH);
         setTitle("Fanorona");
