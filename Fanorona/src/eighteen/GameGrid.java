@@ -15,6 +15,7 @@ public class GameGrid extends JComponent{
 		columns = y;
 		Dimension size = getPreferredSize();
 		//size.width = size.height = Math.max(size.width, size.height);
+		setSize(size);
 		setPreferredSize(size);
 		//setContentAreaFilled(false);
 		

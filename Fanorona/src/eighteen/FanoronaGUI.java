@@ -77,8 +77,8 @@ public class FanoronaGUI extends JFrame {
     }
     public void makePieces()
     {
-    	JPanel jBoard = new JPanel();
-    	jBoard.setLayout(new GridLayout(Board.ROWS,Board.COLUMNS,15,15));
+    	BoardPanel jBoard = new BoardPanel(Board.ROWS, Board.COLUMNS);
+    	jBoard.setLayout(new GridLayout(Board.ROWS,Board.COLUMNS,10,10));
         for(int x= 0;x<Board.ROWS;x++)
         {
         	for(int y = 0; y<Board.COLUMNS; y++)
@@ -217,7 +217,7 @@ public class FanoronaGUI extends JFrame {
     	prevMoveDrawn = null;
     	userPickState = null;
     	makePieces();
-    	//makeGrid();
+    //	makeGrid();
     	makeAttackWithdrawButton();
     	makeHelpButton();
     	makeInfoPanel();
@@ -225,9 +225,8 @@ public class FanoronaGUI extends JFrame {
     	makeEndTurnButton();
     	makePieceListeners();
     	game.add(topRow, BorderLayout.NORTH);
-    	setSize(500,350);
         setTitle("Fanorona");
-        
+        pack();
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         setVisible(true);
@@ -296,7 +295,7 @@ public class FanoronaGUI extends JFrame {
 	    			try
 	    			{
 		    			Move moveToPlay = null;
-						moveToPlay = new Move(prevMove, new Piece.adjLoc(pieceClicked), AttackState.NIETHER);
+						moveToPlay = new Move(prevMove, new Piece.adjLoc(pieceClicked), AttackState.NEITHER);
 						moveToPlay.state = board.isAdvancing(moveToPlay);//now constructed, check move if attacking or withdrawing
 						//prompt user if needed
 						if (moveToPlay.state == AttackState.BOTH)

@@ -43,7 +43,8 @@ public class AI {
 				}
 				TreeNode newChild = new TreeNode(newBoard);
 				node.addChild(newChild);
-				chainCheck(newChild);
+				if(move.getState() == AttackState.ADVANCING || move.getState() == AttackState.WITHDRAWING)
+					chainCheck(newChild);
 				
 			}
 		}
