@@ -1,5 +1,5 @@
 package eighteen;
 
 public enum AttackState {
-	ADVANCING, WITHDRAWING, BOTH, NEITHER
+	ADVANCING, WITHDRAWING, BOTH, NEITHER, SACRIFICE
 }

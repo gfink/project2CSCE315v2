@@ -123,7 +123,7 @@ public class FanoronaGUI extends JFrame {
          });
          withdraw.addActionListener(new ActionListener() {
              public void actionPerformed(ActionEvent event) {
-
+            	 
              }
          });
          topRow.add(attack);
@@ -238,10 +238,10 @@ public class FanoronaGUI extends JFrame {
 				
 	    		for (Move m : AIMoves) {
 	    			System.out.println(m);
-	    			for(Piece.adjLoc loc: board.previousLocations) {
-	    				System.out.print(loc);
-	    			}
-	    			System.out.println();
+	  //  			for(Piece.adjLoc loc: board.previousLocations) {
+	  // 				System.out.print(loc);
+	  // 			}
+	  //  			System.out.println();
 					gamePieces[m.end.row][m.end.column].pColor = opponent.getColor();
 					gamePieces[m.end.row][m.end.column].repaint();
 					//make the previous point turn gray
@@ -254,8 +254,7 @@ public class FanoronaGUI extends JFrame {
 		    			/*for(Piece.adjLoc prev: board.previousLocations) {
 			    			System.out.println(prev);
 		    			}*/
-						for(Piece p : piecesToColor)
-		    			{
+						for(Piece p : piecesToColor) {
 		    					gamePieces[p.row][p.column].pColor = Color.GRAY;
 		    					gamePieces[p.row][p.column].repaint();
 		    			}
@@ -290,7 +289,7 @@ public class FanoronaGUI extends JFrame {
 	    			try {
 		    			Move moveToPlay = null;
 						moveToPlay = new Move(prevMove, new Piece.adjLoc(pieceClicked), AttackState.NEITHER);
-						moveToPlay.state = board.isAdvancing(moveToPlay);//now constructed, check move if attacking or withdrawing
+						moveToPlay.state = board.isAdvancing(moveToPlay); //now constructed, check move if attacking or withdrawing
 						//prompt user if needed
 						if (moveToPlay.state == AttackState.BOTH) {
 							//TODO ask user for one, right now just set to attacking
@@ -308,10 +307,8 @@ public class FanoronaGUI extends JFrame {
 			    			gamePieces[prevMoveDrawn.xLoc][prevMoveDrawn.yLoc].repaint();
 			    			//modify potential moves back to gray
 			    			if(prevMove.getColor() == playerColor)
-				    	    	for(adjLoc p : prevMove.adjacentLocations)
-				    			{
-				    				if (gamePieces[p.row][p.column].pColor == Color.YELLOW)
-				    				{
+				    	    	for(adjLoc p : prevMove.adjacentLocations) {
+				    				if (gamePieces[p.row][p.column].pColor == Color.YELLOW) {
 				    					gamePieces[p.row][p.column].pColor = Color.GRAY;
 				    					gamePieces[p.row][p.column].repaint();
 				    				}
@@ -324,7 +321,8 @@ public class FanoronaGUI extends JFrame {
 			    					gamePieces[p.row][p.column].repaint();
 			    			}
 			    			
-			    	    	System.out.print("Moved to x:" + gamePiece.xLoc+" y:"+gamePiece.yLoc + " from x:" +prevMove.row +" y:"+prevMove.column +"\n" );
+			    	    	System.out.print("Moved to x:" + gamePiece.xLoc + " y:" + gamePiece.yLoc + 
+			    	    					 " from x:" +prevMove.row + " y:" + prevMove.column + "\n");
 			    	    	//set up for next turn
 			    	    	prevMoveDrawn = null;
 			    	    	prevMove = null;
@@ -345,43 +343,35 @@ public class FanoronaGUI extends JFrame {
 		    			//TODO check if game over by win or by too many moves
 					}
 	    		}
-	    		else if (gamePiece.pColor != Color.YELLOW && gamePiece.pColor != Color.GRAY && !isMoveState2)
-	    		{
-	    			try
-	    			{
-	    			//highlight all available moves, if not making a move, and if the piece clicked isn't gray
-	    			//TODO THIS NEEDS TO TAKE INTO ACCOUNT OTHER CAPTURES ON THE BOARD EVENTUALLY
-	    			//getValidMoves(Color), returns a list of moves, List<Move>
-	    			//using the start location given by the click, iterate through List<Move> to find all available moves
-	    			//using the clicked piece to start
-	    			//then color those
-	    			ArrayList<Move> validMoves = board.getValidMoves(board.turn);
-	    			boolean ColorChanged = false;
-	    			if(validMoves.isEmpty())
-	    			{
-	    				System.out.println("No valid moves...");
-	    			}
-		    		for(Move m : validMoves)
-		    		{
-		    			System.out.println("Start " + m.start + "... Clicked " + pieceClicked);
-		    			if (m.start.equals(pieceClicked))
-		    			{
-		    				gamePieces[m.start.row][m.start.column].selected = true;
-		    				ColorChanged = true;
-		    				gamePieces[m.end.row][m.end.column].pColor = Color.YELLOW;
-		    				gamePieces[m.end.row][m.end.column].repaint();
+	    		else if (gamePiece.pColor != Color.YELLOW && gamePiece.pColor != Color.GRAY && !isMoveState2) {
+	    			try {
+		    			//highlight all available moves, if not making a move, and if the piece clicked isn't gray
+		    			//TODO THIS NEEDS TO TAKE INTO ACCOUNT OTHER CAPTURES ON THE BOARD EVENTUALLY
+		    			//getValidMoves(Color), returns a list of moves, List<Move>
+		    			//using the start location given by the click, iterate through List<Move> to find all available moves
+		    			//using the clicked piece to start
+		    			//then color those
+		    			ArrayList<Move> validMoves = board.getValidMoves(board.turn);
+		    			boolean ColorChanged = false;
+		    			if(validMoves.isEmpty()) {
+		    				System.out.println("No valid moves...");
 		    			}
-		    		}
-		    		if(ColorChanged)
-		    		{
-		    			prevMoveDrawn = gamePiece;
-		    			prevMove = pieceClicked;
-		    			isMoveState2 = true;
-		    		}
-		    		System.out.print("Clicked x:" + gamePiece.xLoc+" y:"+gamePiece.yLoc+"\n");
+			    		for(Move m : validMoves) {
+			    			if (m.start.equals(pieceClicked)) {
+			    				gamePieces[m.start.row][m.start.column].selected = true;
+			    				ColorChanged = true;
+			    				gamePieces[m.end.row][m.end.column].pColor = Color.YELLOW;
+			    				gamePieces[m.end.row][m.end.column].repaint();
+			    			}
+			    		}
+			    		if(ColorChanged) {
+			    			prevMoveDrawn = gamePiece;
+			    			prevMove = pieceClicked;
+			    			isMoveState2 = true;
+			    		}
+			    		System.out.print("Clicked x:" + gamePiece.xLoc + " y:" + gamePiece.yLoc + "\n");
 	    			}
-	    			catch (BadMoveException e1) 
-	    			{
+	    			catch (BadMoveException e1)  {
 						e1.printStackTrace();
 						//TODO something about the GameOverException
 					}
@@ -389,5 +379,4 @@ public class FanoronaGUI extends JFrame {
     		}		
     	}
     }
-    
 }

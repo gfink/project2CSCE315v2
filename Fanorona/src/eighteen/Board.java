@@ -175,7 +175,6 @@ public class Board {
 				}
 			}
 			if(!(new Piece.adjLoc(mov.getStart())).equals(previousSpot)) {
-				System.out.println("Previous spot = [" + previousSpot.row + " ," + previousSpot.column + "]");
 				throw new BadMoveException("Bad move at [" + mov.getStart().row + ", " + mov.getStart().column + "] -> Wrong starting spot");
 			}
 			else if(previousDirection == mov.getDirection()) {
@@ -261,7 +260,6 @@ public class Board {
 		previousSpot = mov.getEnd();
 		previousDirection = mov.getDirection();
 		previousLocations.add(new Piece.adjLoc(mov.getStart()));
-		System.out.println("Adding " + mov.getStart() + " to prevLoc");
 		chainMoves.add(mov);
 		if(mov.state == AttackState.NEITHER)
 			chain = false;
@@ -594,9 +592,13 @@ public class Board {
 								}
 							}
 							// No capture move are possible
-							if(capture.isEmpty()) {
-								Move newMove = new Move(piece, end, AttackState.NEITHER);
-								paika.add(newMove);
+							else {
+								if(capture.isEmpty()) {
+									paika.add(new Move(piece, end, AttackState.NEITHER));
+//									paika.add(new Move(piece, end, AttackState.SACRIFICE));
+								}
+//								else 
+//									capture.add(new Move(piece, end, AttackState.SACRIFICE));
 							}
 						}
 					}
