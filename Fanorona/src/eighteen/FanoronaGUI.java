@@ -20,8 +20,7 @@ import eighteen.Piece.adjLoc;
 public class FanoronaGUI extends JFrame {
 	//TODO if choice between pieces, pick attacking or retreating
 	//TODO end move button
-	//TODO add to a tool bar or button bar containing buttons for help, 
-			//end move, attack/retreat, game setup options, connect to opponent, sacrifice piece
+	//TODO add to a tool bar or button bar containing buttons for game setup options, connect to opponent, sacrifice piece
 	JButton helpb;
 	JPanel topRow = new JPanel();	
 	Board board; //contains the array of pieces and board management functions
@@ -146,15 +145,59 @@ public class FanoronaGUI extends JFrame {
     	 EndTurn.setBounds(50,60,80,30);
     	 EndTurn.addActionListener(new ActionListener() {
              public void actionPerformed(ActionEvent event) {
-            	 endTurn();
+            	 if(!isMoveState2 && board.chain) {
+            		System.out.print("End turn pressed\n");
+            		//RUN AI
+            		try {
+        	    		ArrayList<Move> AIMoves;
+        	    		opponent.opponentMove(board);
+        				AIMoves = opponent.alphaBetaSearch();
+        				
+        				System.out.println("Number of AI moves to make: " + AIMoves.size());
+        				
+        	    		for (Move m : AIMoves) {
+        	    			System.out.println(m);
+        	  //  			for(Piece.adjLoc loc: board.previousLocations) {
+        	  // 				System.out.print(loc);
+        	  // 			}
+        	  //  			System.out.println();
+        					gamePieces[m.end.row][m.end.column].pColor = opponent.getColor();
+        					gamePieces[m.end.row][m.end.column].repaint();
+        					//make the previous point turn gray
+        					gamePieces[m.start.row][m.start.column].pColor = Color.GRAY;
+        					gamePieces[m.start.row][m.start.column].repaint();
+        					
+        					ArrayList<Piece> piecesToColor;
+        					try {
+        						piecesToColor = board.move(m);
+        		    			/*for(Piece.adjLoc prev: board.previousLocations) {
+        			    			System.out.println(prev);
+        		    			}*/
+        						for(Piece p : piecesToColor) {
+        		    					gamePieces[p.row][p.column].pColor = Color.GRAY;
+        		    					gamePieces[p.row][p.column].repaint();
+        		    			}
+        					} catch (GameOverException e) {
+        						// TODO Auto-generated catch block
+        						e.printStackTrace();
+        					}
+        					prevMoveDrawn = null;
+        	    	    	prevMove = null;
+        	    			if(!board.chain)
+        	    				changeTurn();//the board will automatically change the turn, the gui needs to be updated manually though
+        	    		}
+            		} catch (BadMoveException e) {
+        				// TODO Auto-generated catch block
+        				e.printStackTrace();
+        			}
+            		//RUN AI END
+            		changeTurn();
+            		board.switchTurn();//has to be called manually since it is normally called in move(), which isn't called here
+            		updateInfoPanel();
+            	 }
              }
          });
          topRow.add(EndTurn);
-    }
-    
-    public void endTurn() {
-		changeTurn();//for the gui, not in the board
-		board.switchTurn();//for the board in the code
     }
     
     public void resetPrevMove() {
@@ -181,14 +224,9 @@ public class FanoronaGUI extends JFrame {
 		for(int x= 0;x<Board.ROWS;x++) {
         	for(int y = 0; y<Board.COLUMNS; y++)
         	{
-			gamePieces[x][y].addActionListener(clicked);
+        		gamePieces[x][y].addActionListener(clicked);
         	}
 		}
-    }
-    
-    public void makeGrid() {
-    	GameGrid grid = new GameGrid(Board.ROWS, Board.COLUMNS);
-    	game.add(grid,BorderLayout.CENTER);
     }
     
     public FanoronaGUI() {
@@ -211,7 +249,6 @@ public class FanoronaGUI extends JFrame {
     	prevMoveDrawn = null;
     	userPickState = null;
     	makePieces();
-    //	makeGrid();
     	makeAttackWithdrawButton();
     	makeHelpButton();
     	makeInfoPanel();
@@ -278,8 +315,6 @@ public class FanoronaGUI extends JFrame {
     	}
     	
     	public void actionPerformed(ActionEvent e) {
-    		//TODO check if chain, and if so function correctly
-    		//TODO prevent turn if not correct player
     		DrawnPiece gamePiece = (DrawnPiece) e.getSource();
     		Piece pieceClicked = board.theBoard[gamePiece.xLoc][gamePiece.yLoc];
     		//first check if the piece clicked is an available piece
@@ -292,6 +327,7 @@ public class FanoronaGUI extends JFrame {
 						//prompt user if needed
 						if (moveToPlay.state == AttackState.BOTH) {
 							//TODO ask user for one, right now just set to attacking
+							System.out.print("USER REACHED CHOICE OF ADVANCING OR WITHDRAWING\n");
 							moveToPlay.state = AttackState.ADVANCING;
 						}
 						//then set the value externally
@@ -345,7 +381,6 @@ public class FanoronaGUI extends JFrame {
 	    		else if (gamePiece.pColor != Color.YELLOW && gamePiece.pColor != Color.GRAY && !isMoveState2) {
 	    			try {
 		    			//highlight all available moves, if not making a move, and if the piece clicked isn't gray
-		    			//TODO THIS NEEDS TO TAKE INTO ACCOUNT OTHER CAPTURES ON THE BOARD EVENTUALLY
 		    			//getValidMoves(Color), returns a list of moves, List<Move>
 		    			//using the start location given by the click, iterate through List<Move> to find all available moves
 		    			//using the clicked piece to start
