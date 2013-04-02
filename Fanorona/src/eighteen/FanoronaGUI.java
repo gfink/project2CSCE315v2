@@ -41,16 +41,16 @@ public class FanoronaGUI extends JFrame {
     public static void main(String[] args) {
        GUI =  new FanoronaGUI();
     }
-    public void changeTurn()
-    {
+    
+    public void changeTurn() {
     	if (playerTurn=="WHITE")
     		playerTurn = "BLACK";
     	else
     		playerTurn = "WHITE";
     	
     }
-    public void makeInfoPanel()
-    {
+    
+    public void makeInfoPanel() {
     	JPanel InfoPanel = new JPanel();
     	GridLayout Lay = new GridLayout();
     	InfoPanel.setLayout(Lay);
@@ -67,32 +67,27 @@ public class FanoronaGUI extends JFrame {
     	InfoPanel.add(currentTurn);
     	game.add(InfoPanel,BorderLayout.SOUTH);
     }
-    public void updateInfoPanel()
-    {
+    
+    public void updateInfoPanel() {
     	blackPieces.setText("Black: "+board.blacks);
     	whitePieces.setText("White: "+board.whites);
     	movesMade.setText("Move: "+board.moves);
     	utilityVal.setText("Utility: "+board.Utility());
     	currentTurn.setText("Turn: " + playerTurn);
     }
-    public void makePieces()
-    {
+    
+    public void makePieces() {
     	BoardPanel jBoard = new BoardPanel(Board.ROWS, Board.COLUMNS);
     	jBoard.setLayout(new GridLayout(Board.ROWS,Board.COLUMNS,10,10));
-        for(int x= 0;x<Board.ROWS;x++)
-        {
-        	for(int y = 0; y<Board.COLUMNS; y++)
-        	{
-        		if(board.theBoard[x][y].getColor() == Color.BLACK)
-        		{
+        for(int x= 0;x<Board.ROWS;x++) {
+        	for(int y = 0; y<Board.COLUMNS; y++) {
+        		if(board.theBoard[x][y].getColor() == Color.BLACK) {
         			gamePieces[x][y] = new DrawnPiece(x,y,Color.BLACK);
         		}
-        		else if(board.theBoard[x][y].getColor() == Color.WHITE)
-        		{
+        		else if(board.theBoard[x][y].getColor() == Color.WHITE) {
         			gamePieces[x][y] = new DrawnPiece(x,y,Color.WHITE);
         		}
-        		else
-        		{
+        		else {
         			gamePieces[x][y] = new DrawnPiece(x,y,Color.GRAY);
         		}
         		jBoard.add(gamePieces[x][y]);
@@ -100,8 +95,8 @@ public class FanoronaGUI extends JFrame {
         }
         game.add(jBoard,BorderLayout.CENTER);
     }
-    public void makeHelpButton()
-    {
+    
+    public void makeHelpButton() {
     	 helpb = new JButton("Help");
          helpb.setBounds(50,60,80,30);
          helpb.addActionListener(new ActionListener() {
@@ -112,8 +107,8 @@ public class FanoronaGUI extends JFrame {
          });
          topRow.add(helpb);
     }
-    public void makeAttackWithdrawButton()
-    {
+    
+    public void makeAttackWithdrawButton() {
     	 JButton attack = new JButton("Attack");
     	 JButton withdraw = new JButton("Withdraw");
     	 attack.setBounds(50,60,80,30);
@@ -134,8 +129,8 @@ public class FanoronaGUI extends JFrame {
          topRow.add(attack);
          topRow.add(withdraw);
     }
-    public void makeMoveCancelButton()
-    {
+    
+    public void makeMoveCancelButton() {
     	 JButton cancelMove = new JButton("Cancel Move");
     	 cancelMove.setBounds(50,60,80,30);
     	 cancelMove.addActionListener(new ActionListener() {
@@ -146,8 +141,8 @@ public class FanoronaGUI extends JFrame {
          });
          topRow.add(cancelMove);
     }
-    public void makeEndTurnButton()
-    {
+    
+    public void makeEndTurnButton() {
     	 JButton EndTurn = new JButton("End Turn");
     	 EndTurn.setBounds(50,60,80,30);
     	 EndTurn.addActionListener(new ActionListener() {
@@ -157,46 +152,46 @@ public class FanoronaGUI extends JFrame {
          });
          topRow.add(EndTurn);
     }
-    public void endTurn()
-    {
+    
+    public void endTurn() {
 		changeTurn();//for the gui, not in the board
 		board.switchTurn();//for the board in the code
     }
-    public void resetPrevMove()
-    {
+    
+    public void resetPrevMove() {
     	//eventually display that the move was reset visually
     	System.out.print("ResetPrevMove\n");
-    	if(prevMove != null)
-    	{
-	    	for(adjLoc p : prevMove.adjacentLocations)
-			{
+    	if(prevMove != null) {
+	    	for(adjLoc p : prevMove.adjacentLocations) {
 				if (gamePieces[p.row][p.column].pColor == Color.YELLOW)
 				{
 					gamePieces[p.row][p.column].pColor = Color.GRAY;
 					gamePieces[p.row][p.column].repaint();
 				}
 			}
+	    	prevMoveDrawn.selected = false;
+	    	prevMoveDrawn.repaint();
 	    	prevMoveDrawn = null;
 	    	prevMove = null;
-	    	isMoveState2=false;
+	    	isMoveState2 = false;
     	}
     }
-    public void makePieceListeners()
-    {
+    
+    public void makePieceListeners() {
     	clicked = new PieceListener(); 
-		for(int x= 0;x<Board.ROWS;x++)
-        {
+		for(int x= 0;x<Board.ROWS;x++) {
         	for(int y = 0; y<Board.COLUMNS; y++)
         	{
 			gamePieces[x][y].addActionListener(clicked);
         	}
 		}
     }
-    public void makeGrid()
-    {
+    
+    public void makeGrid() {
     	GameGrid grid = new GameGrid(Board.ROWS, Board.COLUMNS);
     	game.add(grid,BorderLayout.CENTER);
     }
+    
     public FanoronaGUI() {
     	game.setLayout(new BorderLayout());
     	topRow.setLayout(new FlowLayout());
@@ -231,10 +226,9 @@ public class FanoronaGUI extends JFrame {
         setLocationRelativeTo(null);
         setVisible(true);
     }
-    class PieceListener implements ActionListener
-    {
-    	public void runAIMove(Board board)
-    	{
+    
+    class PieceListener implements ActionListener {
+    	public void runAIMove(Board board) {
     		try {
 	    		ArrayList<Move> AIMoves;
 	    		opponent.opponentMove(board);
@@ -242,9 +236,12 @@ public class FanoronaGUI extends JFrame {
 				
 				System.out.println("Number of AI moves to make: " + AIMoves.size());
 				
-	    		for (Move m : AIMoves)
-	    		{
+	    		for (Move m : AIMoves) {
 	    			System.out.println(m);
+	    			for(Piece.adjLoc loc: board.previousLocations) {
+	    				System.out.print(loc);
+	    			}
+	    			System.out.println();
 					gamePieces[m.end.row][m.end.column].pColor = opponent.getColor();
 					gamePieces[m.end.row][m.end.column].repaint();
 					//make the previous point turn gray
@@ -281,52 +278,48 @@ public class FanoronaGUI extends JFrame {
 				e.printStackTrace();
 			}
     	}
-    	public void actionPerformed(ActionEvent e)
-    	{
+    	
+    	public void actionPerformed(ActionEvent e) {
     		//TODO check if chain, and if so function correctly
     		//TODO prevent turn if not correct player
     		DrawnPiece gamePiece = (DrawnPiece) e.getSource();
     		Piece pieceClicked = board.theBoard[gamePiece.xLoc][gamePiece.yLoc];
     		//first check if the piece clicked is an available piece
-    		if (gamePiece.pColor == playerColor || gamePiece.pColor == Color.YELLOW)
-    		{
-	    		if (gamePiece.pColor == Color.YELLOW && isMoveState2)//already selected
-	    		{
-	    			try
-	    			{
+    		if (gamePiece.pColor == playerColor || gamePiece.pColor == Color.YELLOW) {
+	    		if (gamePiece.pColor == Color.YELLOW && isMoveState2) { //already selected
+	    			try {
 		    			Move moveToPlay = null;
 						moveToPlay = new Move(prevMove, new Piece.adjLoc(pieceClicked), AttackState.NEITHER);
 						moveToPlay.state = board.isAdvancing(moveToPlay);//now constructed, check move if attacking or withdrawing
 						//prompt user if needed
-						if (moveToPlay.state == AttackState.BOTH)
-						{
+						if (moveToPlay.state == AttackState.BOTH) {
 							//TODO ask user for one, right now just set to attacking
 							moveToPlay.state = AttackState.ADVANCING;
 						}
 						//then set the value externally
-						if (board.isValidMove(moveToPlay))
-						{
+						if (board.isValidMove(moveToPlay)) {
 		    				System.out.print("Move was valid\n");
 			    			//make the point clicked the color of the previous point clicked
 			    			gamePieces[pieceClicked.row][pieceClicked.column].pColor = playerColor;
 			    			gamePieces[pieceClicked.row][pieceClicked.column].repaint();
-			    			//make the previous point turn gray
+			    			//make the previous point turn gray and removes the green selection color
 			    			gamePieces[prevMoveDrawn.xLoc][prevMoveDrawn.yLoc].pColor = Color.GRAY;
+			    			gamePieces[prevMoveDrawn.xLoc][prevMoveDrawn.yLoc].selected = false;
 			    			gamePieces[prevMoveDrawn.xLoc][prevMoveDrawn.yLoc].repaint();
 			    			//modify potential moves back to gray
-			    	    	for(adjLoc p : prevMove.adjacentLocations)
-			    			{
-			    				if (gamePieces[p.row][p.column].pColor == Color.YELLOW)
-			    				{
-			    					gamePieces[p.row][p.column].pColor = Color.GRAY;
-			    					gamePieces[p.row][p.column].repaint();
-			    				}
-			    			}
+			    			if(prevMove.getColor() == playerColor)
+				    	    	for(adjLoc p : prevMove.adjacentLocations)
+				    			{
+				    				if (gamePieces[p.row][p.column].pColor == Color.YELLOW)
+				    				{
+				    					gamePieces[p.row][p.column].pColor = Color.GRAY;
+				    					gamePieces[p.row][p.column].repaint();
+				    				}
+				    			}
 			    	    	//returns the list of pieces that need to be painted
 			    	    	ArrayList<Piece> piecesToColor = board.move(moveToPlay);
 			    	    	//re-color captured pieces
-			    	    	for(Piece p : piecesToColor)
-			    			{
+			    	    	for(Piece p : piecesToColor) {
 			    					gamePieces[p.row][p.column].pColor = Color.GRAY;
 			    					gamePieces[p.row][p.column].repaint();
 			    			}
@@ -352,7 +345,7 @@ public class FanoronaGUI extends JFrame {
 		    			//TODO check if game over by win or by too many moves
 					}
 	    		}
-	    		else if (gamePiece.pColor !=Color.YELLOW && gamePiece.pColor != Color.GRAY && !isMoveState2)
+	    		else if (gamePiece.pColor != Color.YELLOW && gamePiece.pColor != Color.GRAY && !isMoveState2)
 	    		{
 	    			try
 	    			{
@@ -366,12 +359,14 @@ public class FanoronaGUI extends JFrame {
 	    			boolean ColorChanged = false;
 	    			if(validMoves.isEmpty())
 	    			{
-	    				
+	    				System.out.println("No valid moves...");
 	    			}
 		    		for(Move m : validMoves)
 		    		{
-		    			if (m.start == pieceClicked)
+		    			System.out.println("Start " + m.start + "... Clicked " + pieceClicked);
+		    			if (m.start.equals(pieceClicked))
 		    			{
+		    				gamePieces[m.start.row][m.start.column].selected = true;
 		    				ColorChanged = true;
 		    				gamePieces[m.end.row][m.end.column].pColor = Color.YELLOW;
 		    				gamePieces[m.end.row][m.end.column].repaint();
@@ -379,8 +374,8 @@ public class FanoronaGUI extends JFrame {
 		    		}
 		    		if(ColorChanged)
 		    		{
-		    			prevMoveDrawn=gamePiece;
-		    			prevMove=pieceClicked;
+		    			prevMoveDrawn = gamePiece;
+		    			prevMove = pieceClicked;
 		    			isMoveState2 = true;
 		    		}
 		    		System.out.print("Clicked x:" + gamePiece.xLoc+" y:"+gamePiece.yLoc+"\n");

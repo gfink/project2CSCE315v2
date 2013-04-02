@@ -20,6 +20,7 @@ public class AI {
 		levels = 1;
 	}
 	
+	// Adds a new level to the Min-Max tree
 	public void getNewLevel() throws BadMoveException {
 		addLevel(minMaxTree.getRoot());
 		levels++;
@@ -30,11 +31,12 @@ public class AI {
 	}
 	
 	public void addLevel(TreeNode node) throws BadMoveException {
+		// If the node doesn't have children, we've reached the bottom of the tree
 		if(!node.hasChildren()) {
 			Color color = Board.oppositeColor(node.board.chainColor);
 			ArrayList<Move> validMoves = node.board.getValidMoves(color);
-			System.out.println("Found " + validMoves.size() + " moves.");
 			for(Move move: validMoves) {
+				// Must create a duplicate board to not alter the original one
 				Board newBoard = new Board(node.board); 
 				try {
 					newBoard.move(move);
@@ -43,11 +45,12 @@ public class AI {
 				}
 				TreeNode newChild = new TreeNode(newBoard);
 				node.addChild(newChild);
+				// Checks for chain possibilities
 				if(move.getState() == AttackState.ADVANCING || move.getState() == AttackState.WITHDRAWING)
 					chainCheck(newChild);
-				
 			}
 		}
+		// Haven't reached the deepest level, keep iterating
 		else
 			for(TreeNode child: node.getChildren())
 				addLevel(child);
@@ -59,42 +62,56 @@ public class AI {
 		}
 	}
 	
+	// Checks for chain possibilities of a created child node
 	public void chainCheck(TreeNode child) throws BadMoveException {
 		Piece.adjLoc previousSpot = child.board.previousSpot;
-		ArrayList<Move> chainMoves = child.board.getValidChainMoves(previousSpot);
-		System.out.println("Found " + chainMoves.size() + " chain possiblities.");
-		for(Move move: chainMoves) {
-			Board newBoard = new Board(child.board);
-			try {
-				newBoard.move(move);
-			} catch (GameOverException e) {
-				e.printStackTrace();
+		// Ensures that no incorrect chain assumptions are made
+		if(child.board.turn == myColor) {
+			ArrayList<Move> chainMoves = child.board.getValidChainMoves(previousSpot);
+			System.out.println("Found " + chainMoves.size() + " chain possiblities.");
+			for(Move move: chainMoves) {
+				Board newBoard = new Board(child.board);
+				try {
+					newBoard.move(move);
+				} catch (GameOverException e) {
+					e.printStackTrace();
+				}
+				// It's a sibling NOT a child
+				TreeNode newSibling = new TreeNode(newBoard);
+				child.getParent().addChild(newSibling);
+				chainCheck(newSibling);
 			}
-			TreeNode newSibling = new TreeNode(newBoard);
-			child.getParent().addChild(newSibling);
-			chainCheck(newSibling);
 		}
 	}
 	
+	// Finds opponent's move and updates the board accordingly
 	public void opponentMove(Board newBoard) {
 		TreeNode root = minMaxTree.getRoot();
+		boolean found = false;
+		// Somehow tree has no children, make a new root node
 		if(!root.hasChildren()) {
 			System.out.println("AI had no children in tree.");
 			TreeNode newRoot = new TreeNode(newBoard);
 			minMaxTree.setRoot(newRoot);
 		}
+		// Iterate through children and find the board
 		else {
 			System.out.println("AI had children in tree");
 			for(TreeNode child: root.getChildren()) {
 				if(child.board.equals(newBoard)) {
+					found = true;
 					System.out.println("AI found the move made.");
 					minMaxTree.setRoot(child);
 					break;
 				}
 			}
 		}
+		// Unknown move, create a new node and start a new tree
+		if(!found)
+			minMaxTree.setRoot(new TreeNode(newBoard));
 	}
 	
+	// Searches for the best board state and returns the corresponding moves
 	public ArrayList<Move> alphaBetaSearch() throws BadMoveException {
 		TreeNode root = minMaxTree.getRoot();
 		if(!root.hasChildren()) {
@@ -102,6 +119,7 @@ public class AI {
 			getNewLevel();
 		}
 		double value = 0;
+		// How we start iterating depends on my color and the board's turn
 		if (root.board.chainColor != myColor)
 			if(myColor == Color.WHITE)
 				value = maxValue(root, -999999, 999999);
@@ -112,14 +130,14 @@ public class AI {
 				value = minValue(root, -999999, 999999);
 			else
 				value = maxValue(root, -999999, 999999);
-//		System.out.println("Value found: " + value);
+		// Finds the node with the highest value
 		for(TreeNode child: root.getChildren()) {
-//			System.out.println("Child traversal value: " + child.traversalValue);
 			if(child.traversalValue == value) {
 				minMaxTree.setRoot(child);
 				return child.getMoves();
 			}
 		}
+		// Fall-back for if no moves are found
 		System.out.println("No move found");
 		return new ArrayList<Move>();
 	}

@@ -4,12 +4,11 @@ import java.awt.BorderLayout;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-public class HelpGUI extends JFrame{
+public class HelpGUI extends JFrame {
 
 	private static final long serialVersionUID = 1L;
 	
-	public HelpGUI() 
-	{
+	public HelpGUI() {
 		
 		String helpTextString = 
 				"This is where the help information will go " +

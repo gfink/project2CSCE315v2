@@ -143,6 +143,7 @@ public class Board {
 	public Color switchTurn() {
 		chain = false;
 		turn = oppositeColor(turn);
+		System.out.println("Changing turns...");
 		previousLocations.clear();
 		previousDirection = null;
 		//chainMoves = new ArrayList<Move>();
@@ -231,6 +232,7 @@ public class Board {
 			nextColumn = mov.getStart().column;
 		}
 		
+		// Finds the pieces being removed, and adds the updated pieces so the GUI can change them
 		ArrayList<Piece> ret = new ArrayList<Piece>();
 		try {
 			while(true) {
@@ -253,11 +255,13 @@ public class Board {
 				ret.add(theBoard[nextRow][nextColumn]);
 			}
 		}
+		// Update all the variables
 		finally {}
 		chainColor = mov.getColor();
 		previousSpot = mov.getEnd();
 		previousDirection = mov.getDirection();
 		previousLocations.add(new Piece.adjLoc(mov.getStart()));
+		System.out.println("Adding " + mov.getStart() + " to prevLoc");
 		chainMoves.add(mov);
 		if(mov.state == AttackState.NEITHER)
 			chain = false;
@@ -293,18 +297,21 @@ public class Board {
 	}
 	
 	public boolean isValidMove(Move mov) {
-		//Space is taken
+		// Space is taken
 		if(getPiece(mov.getEnd().row, mov.getEnd().column).getColor() != Color.GRAY) {
 			return false;
 		}
+		// Can't travel the same direction twice
 		if(previousDirection == mov.getDirection())
 			return false;
 		if(Piece.isValidSpace(mov.getStart().row, mov.getStart().column) && !mov.getStart().equals(mov.getEnd())) {
 			for(Piece.adjLoc prev: previousLocations) {
+				// Can't move to it's own spot
 				if(prev.equals(mov.getEnd())) {
 					return false;
 				}
 			}
+			// The ending point must be adjacent to the start point
 			for(Piece.adjLoc p : mov.getStart().adjacentLocations)
 			{
 				if(p.column == mov.getEnd().column && p.row == mov.getEnd().row) 
@@ -317,11 +324,12 @@ public class Board {
 		return false;
 	}
 	
+	// Finds an attack state of a possible move
 	public AttackState isAdvancing(Move mov) {
 		int iterateVertical = mov.getEnd().row - mov.getStart().row;
-		int iterateHorazontil = mov.getEnd().column - mov.getStart().column;
-		Piece.adjLoc nextSpace = new Piece.adjLoc(mov.getEnd().row + iterateVertical, mov.getEnd().column + iterateHorazontil);
-		Piece.adjLoc previousSpace = new Piece.adjLoc(mov.getStart().row - iterateVertical, mov.getStart().column - iterateHorazontil);
+		int iterateHorizontal = mov.getEnd().column - mov.getStart().column;
+		Piece.adjLoc nextSpace = new Piece.adjLoc(mov.getEnd().row + iterateVertical, mov.getEnd().column + iterateHorizontal);
+		Piece.adjLoc previousSpace = new Piece.adjLoc(mov.getStart().row - iterateVertical, mov.getStart().column - iterateHorizontal);
 		if(Piece.isValidSpace(nextSpace)) {
 			if(theBoard[nextSpace.row][nextSpace.column].getColor() == oppositeColor(mov.getColor())) {
 				if(Piece.isValidSpace(previousSpace)) {
@@ -350,11 +358,7 @@ public class Board {
 		return AttackState.NEITHER;
 	}
 	
-	/* Gets all valid moves for a specific point.
-	 * Doesn't take into account the state of the entire board.
-	 * (e.g. If a capture is possible at another location on the board,
-	 *       this can still return a paika move)
-	 */
+	// Gets all valid chain moves for a specific point
 	public ArrayList<Move> getValidChainMoves(adjLoc place) throws BadMoveException {
 		return getValidChainMoves(place.row, place.column);
 	}
@@ -488,14 +492,17 @@ public class Board {
 			for(int y=0; y < Board.COLUMNS; y++) {
 				Piece piece = getPiece(x, y);
 				Move move = new Move();
+				// It is the color we are checking, find valid moves
 				if(piece.getColor() == color) {
 					move.setStart(piece);
 					for(Piece.adjLoc end: piece.adjacentLocations) {
+						// Can't move to a spot you've already been to
 						if(previousLocations.contains(end)) {
 							continue;
 						}
 						move.setEnd(end);
 						move.updateDirection();
+						// Can't move the same direction twice in a row
 						if(move.getDirection() == previousDirection) {
 							continue;
 						}
@@ -503,6 +510,7 @@ public class Board {
 						int rowWd = 0;
 						int colAdv = 0;
 						int colWd = 0;
+						// Move checking is valid
 						if(isValidMove(move)) {
 							Piece advance;
 							Piece withdraw;
@@ -556,36 +564,36 @@ public class Board {
 								colWd = -1;
 								break;
 							}
+							// Advance and withdraw are possible
 							if(Piece.isValidSpace(piece.row + rowAdv, piece.column + colAdv) && Piece.isValidSpace(piece.row + rowWd, piece.column + colWd)) {
 								advance = theBoard[piece.row + rowAdv][piece.column + colAdv];
 								withdraw = theBoard[piece.row + rowWd][piece.column + colWd];
 								if(advance.getColor() != move.getColor() && !advance.isEmpty()) {
 									Move newMove = new Move(piece, end, AttackState.ADVANCING);
-									if(isValidMove(newMove))
-										capture.add(newMove);
+									capture.add(newMove);
 								}
 								if(withdraw.getColor() != move.getColor() && !withdraw.isEmpty()) {
 									Move newMove = new Move(piece, end, AttackState.WITHDRAWING);
-									if(isValidMove(newMove))
-										capture.add(newMove);
+									capture.add(newMove);
 								}
 							}
+							// Just an advance
 							else if(Piece.isValidSpace(piece.row + rowAdv, piece.column + colAdv)) {
 								advance = theBoard[piece.row + rowAdv][piece.column + colAdv];
 								if(advance.getColor() != move.getColor() && !advance.isEmpty()) {
 									Move newMove = new Move(piece, end, AttackState.ADVANCING);
-									if(isValidMove(newMove))
-										capture.add(newMove);
+									capture.add(newMove);
 								}
 							}
+							// Just a withdraw
 							else if(Piece.isValidSpace(piece.row + rowWd, piece.column + colWd)) {
 								withdraw = theBoard[piece.row + rowWd][piece.column + colWd];
 								if(withdraw.getColor() != move.getColor() && !withdraw.isEmpty()) {
 									Move newMove = new Move(piece, end, AttackState.WITHDRAWING);
-									if(isValidMove(newMove))
-										capture.add(newMove);
+									capture.add(newMove);
 								}
 							}
+							// No capture move are possible
 							if(capture.isEmpty()) {
 								Move newMove = new Move(piece, end, AttackState.NEITHER);
 								paika.add(newMove);
@@ -601,6 +609,7 @@ public class Board {
 			return paika;
 	}
 	
+	// Finds the opposite color
 	public static Color oppositeColor(Color color) {
 		if(color == Color.GRAY) {
 			return Color.GRAY;
@@ -641,6 +650,7 @@ public class Board {
 		return true;
 	}
 	
+	// Displays a board for debugging
 	public void print() {
 		for(int x=0; x < Board.ROWS; x++) {
 			for(int y=0; y < Board.COLUMNS; y++) {

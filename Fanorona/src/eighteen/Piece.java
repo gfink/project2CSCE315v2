@@ -6,33 +6,40 @@ public class Piece {
 	public static class adjLoc{//adjacent location
 		int row;
 		int column;
+		
 		public adjLoc(int x, int y) {
 			row = x;
 			column = y;
 		}
+		
 		public adjLoc(Piece piece) {
 			row = piece.row;
 			column = piece.column;
 		}
+		
 		public boolean equals(adjLoc b) {
 			if(row == b.row && column == b.column) {
 				return true;
 			}
 			return false;
 		}
+		
 		public String toString() {
-			return "[" + row + ", " + column + "]";
+			return "(" + row + ", " + column + ") ";
 		}
 	}
-	private enum PieceState{
+	
+	private enum PieceState {
 		BLACK, WHITE, EMPTY
 	}
+	
 	public int row;
 	public int column;
 	private boolean isEmpty;
 	private Color pieceColor;
 	private PieceState pState;
 	ArrayList<adjLoc> adjacentLocations = new ArrayList<adjLoc>();
+	
 	public Piece(int x, int y, Color c) {
 		row = x;
 		column = y;
@@ -46,61 +53,56 @@ public class Piece {
 	public Piece(Piece a) {
 		this(a.row, a.column, a.getColor());
 	}
-	public void setColor(Color c)
-	{
-		pieceColor=c;
-		if(c == Color.BLACK)
-		{
-			pState=PieceState.BLACK;
+	
+	public void setColor(Color c) {
+		pieceColor = c;
+		if(c == Color.BLACK) {
+			pState = PieceState.BLACK;
 			isEmpty = false;
 		}
-		else if(c == Color.WHITE)
-		{
-			pState=PieceState.WHITE;
+		else if(c == Color.WHITE) {
+			pState = PieceState.WHITE;
 			isEmpty = false;
 		}
-		else if(c == Color.GRAY)
-		{
-			pState=PieceState.EMPTY;
-			isEmpty=true;
+		else if(c == Color.GRAY) {
+			pState = PieceState.EMPTY;
+			isEmpty = true;
 		}
-		else
-		{
+		else {
 			//set some color like yellow or something, leaving this else here anyway
 		}
 		
 	}
-	public Color getColor()
-	{
+	
+	public Color getColor() {
 		return pieceColor;
 	}
-	public Color getPieceState()
-	{
+	
+	public Color getPieceState() {
 		Color c;
-		if(pState==PieceState.BLACK)
-		{
-			c=Color.BLACK;
+		if(pState == PieceState.BLACK) {
+			c = Color.BLACK;
 		}
-		else if(pState==PieceState.WHITE)
-		{
+		else if(pState==PieceState.WHITE) {
 			c=Color.WHITE;
 		}
-		else//is empty
-		{
+		else { //is empty
 			c=Color.GRAY;
 		}
 		return c;
 	}
-	public boolean isEmpty()
-	{
+	
+	public boolean isEmpty() {
 		return isEmpty;
 	}
+	
 	public boolean isValidSpace() {
 		if(row < Board.ROWS && row >= 0 && column < Board.COLUMNS && column >= 0)
 			return true;
 		return false;
 	}
 	
+	// Is it able to be on the board?
 	public static boolean isValidSpace(int s_row, int s_column) {
 		if(s_row < Board.ROWS && s_row >= 0 && s_column < Board.COLUMNS && s_column >= 0)
 			return true;
@@ -111,8 +113,9 @@ public class Piece {
 		return isValidSpace(location.row, location.column);
 	}
 	
-	public void adjacentLocations() 
-	{
+	// Makes the adjacent locations
+	public void adjacentLocations() {
+		// Takes into account diagonals
 		if((row + column) % 2 == 0) {
 			if(isValidSpace(row - 1, column - 1))
 				adjacentLocations.add(new adjLoc(row - 1, column - 1));
@@ -133,10 +136,19 @@ public class Piece {
 			adjacentLocations.add(new adjLoc(row, column + 1));
 	}
 	
-	public boolean equals(Piece a)
-	{
+	public boolean equals(Piece a) {
 		if(a.row == row && a.column == column && a.getColor() == this.getColor())
 			return true;
 		return false;
+	}
+	
+	public boolean equals(adjLoc a) {
+		if(a.row == row && a.column == column)
+			return true;
+		return false;
+	}
+	
+	public String toString() {
+		return "[" + row + ", " + column + "]";
 	}
 }

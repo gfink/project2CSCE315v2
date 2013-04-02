@@ -18,6 +18,10 @@ public class Move {
 		updateDirection();
 	}
 	
+	/*
+	 *  For use in finding valid moves, updates the direction of a possible move
+	 *  after changing the start/end position(s)
+	 */
 	public void updateDirection() throws BadMoveException {
 		if(start.row == end.row && start.column == end.column) {
 			throw new Board.BadMoveException("Bad move initialized");
@@ -56,7 +60,6 @@ public class Move {
 				}
 			}
 		}
-		
 	}
 	
 	public void setStart(Piece start) {
