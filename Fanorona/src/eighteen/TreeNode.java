@@ -15,7 +15,7 @@ public class TreeNode {
 	public TreeNode() {
 		children = new ArrayList<TreeNode>();
 		try {
-			board = new Board();
+			board = new Board(Board.ROWS,Board.COLUMNS);
 		} catch (BadBoardException e) {
 			//This should never happen
 			e.printStackTrace();

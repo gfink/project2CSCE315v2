@@ -19,9 +19,8 @@ import eighteen.Piece.adjLoc;
 
 public class FanoronaGUI extends JFrame {
 	//TODO if choice between pieces, pick attacking or retreating
-	//TODO add to button bar buttons for, sacrifice piece, reset game
+	//TODO add to button for sacrifice piece
 	//Class members for GUI
-	JButton helpb;
 	JPanel topRow = new JPanel();	
 	JLabel blackPieces,whitePieces,movesMade,utilityVal,currentTurn;
 	PieceListener clicked;//given to every piece in a loop
@@ -37,16 +36,6 @@ public class FanoronaGUI extends JFrame {
 	AI opponent;
 	Color playerColor;
 	Boolean isMoveState2 = false;
-	/*
-	 * MAIN IS HERE
-	 */
-    public static void main(String[] args) {
-    	//the options GUI will create an instance of this object
-    	OptionsGUI.OGUI = new OptionsGUI();
-    	OptionsGUI.OGUI.setVisible(true);
-    	//GUI =  new FanoronaGUI();
-    	//start a thread waiting for the user to pick server or client, something like that
-    }
     
     public void changeTurn() {
     	if (playerTurn=="WHITE")
@@ -102,7 +91,7 @@ public class FanoronaGUI extends JFrame {
     }
     
     public void makeHelpButton() {
-    	 helpb = new JButton("Help");
+    	 JButton helpb = new JButton("Help");
          helpb.setBounds(50,60,80,30);
          helpb.addActionListener(new ActionListener() {
              public void actionPerformed(ActionEvent event) {
@@ -174,6 +163,7 @@ public class FanoronaGUI extends JFrame {
             	 if(!isMoveState2 && board.chain) {
             		System.out.print("End turn pressed\n");
             		//RUN AI
+            		//TODO try and make these streamlined using functions, and less copypaste
             		try {
         	    		ArrayList<Move> AIMoves;
         	    		opponent.opponentMove(board);
@@ -183,10 +173,6 @@ public class FanoronaGUI extends JFrame {
         				
         	    		for (Move m : AIMoves) {
         	    			System.out.println(m);
-        	  //  			for(Piece.adjLoc loc: board.previousLocations) {
-        	  // 				System.out.print(loc);
-        	  // 			}
-        	  //  			System.out.println();
         					gamePieces[m.end.row][m.end.column].pColor = opponent.getColor();
         					gamePieces[m.end.row][m.end.column].repaint();
         					//make the previous point turn gray
@@ -196,9 +182,6 @@ public class FanoronaGUI extends JFrame {
         					ArrayList<Piece> piecesToColor;
         					try {
         						piecesToColor = board.move(m);
-        		    			/*for(Piece.adjLoc prev: board.previousLocations) {
-        			    			System.out.println(prev);
-        		    			}*/
         						for(Piece p : piecesToColor) {
         		    					gamePieces[p.row][p.column].pColor = Color.GRAY;
         		    					gamePieces[p.row][p.column].repaint();
@@ -228,7 +211,7 @@ public class FanoronaGUI extends JFrame {
     
     public void resetPrevMove() {
     	//eventually display that the move was reset visually
-    	System.out.print("ResetPrevMove\n");
+    	System.out.print("Canceling selected move\n");
     	if(prevMove != null) {
 	    	for(adjLoc p : prevMove.adjacentLocations) {
 				if (gamePieces[p.row][p.column].pColor == Color.YELLOW)
@@ -342,7 +325,6 @@ public class FanoronaGUI extends JFrame {
 	    				changeTurn();//the board will automatically change the turn, the gui needs to be updated manually though
 	    	    	//re-color captured pieces
 		    		//give ai/opponent move we ran
-		    		//TODO ask for ai/opponent move
 		    		//draw ai/opponent move
 	    		}
     		} catch (BadMoveException e) {

@@ -16,15 +16,13 @@ import javax.swing.JRadioButton;
 public class OptionsGUI extends JFrame{
 	//TODO connect to server option
 	//TODO host server option, choose to host or connect or AI
-	//TODO change board size option, with dropdowns of valid col and row sizes
-	//TODO tell user with jlabel that if any options are changed, the game will reset
 	//TODO cancel button
-	//TODO when ok is clicked , modify game type
 	private static final long serialVersionUID = 1L;
 	public static OptionState currentOptions;
 	public static OptionsGUI OGUI;
 	public static int colNdx = 6;
 	public static int rowNdx = 2;
+	public boolean gameRunning=false;
 	private String[] rcOptions = {"1","3","5","7","9","11","13"};
 	public OptionsGUI() {
 		
@@ -38,6 +36,7 @@ public class OptionsGUI extends JFrame{
 		JLabel sizeLabel = new JLabel("Size of Board");
 		JLabel rowLabel = new JLabel("Rows");
 		JLabel colLabel = new JLabel("Column");
+		JLabel oWarning = new JLabel("Warning, changing any game options mid-game will automatically reset the game!");
 		JPanel radioPanel = new JPanel(new GridLayout(0,1));
 		JPanel sizePanel = new JPanel(new GridLayout(3,2));
 		JComboBox rowList = new JComboBox(rcOptions);
@@ -60,6 +59,7 @@ public class OptionsGUI extends JFrame{
 		sizePanel.add(rowList);
 		sizePanel.add(colLabel);
 		sizePanel.add(colList);
+		add(oWarning,BorderLayout.NORTH);//warning only shows up after you start playing the game
 		add(sizePanel,BorderLayout.LINE_END);
 		add(radioPanel, BorderLayout.LINE_START);
 		add(okButton, BorderLayout.SOUTH);
@@ -97,12 +97,13 @@ public class OptionsGUI extends JFrame{
             	//will restart game with new settings
             	
             	//before creating game, check if option is valid
-            	if (currentOptions.isOptionValid())
+            	if(currentOptions!=currentOptions.prevOption)
             	{
             		currentOptions.prevOption = currentOptions;
             		FanoronaGUI.GUI =  new FanoronaGUI(currentOptions);
-            		OGUI.setVisible(false);
+            		
             	}
+            	OGUI.setVisible(false);
             }
         });
 		/*
@@ -113,19 +114,16 @@ public class OptionsGUI extends JFrame{
 		setLocationRelativeTo(null);
 	}
 	public class OptionState {
+		//values the game starts at
 		Color startColor = Color.WHITE;
 		Color AIColor = Color.BLACK;
-		OptionState prevOption;
+		OptionState prevOption = null;
 		int oRow = 5;
 		int oCol = 13;
 		
 		public OptionState()
 		{
 			
-		}
-		public Boolean isOptionValid()
-		{
-			return true;
 		}
 	}
 	
