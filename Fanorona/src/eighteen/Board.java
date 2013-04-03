@@ -41,6 +41,7 @@ public class Board {
 	int moves;
 	//Whether or not a chain is active
 	boolean chain;
+	//What Color is being chained
 	Color chainColor;
 	Piece.adjLoc previousSpot;
 	Direction previousDirection;
@@ -51,6 +52,7 @@ public class Board {
 	
 	Color turn;
 	
+	//Static as only one game is played at a time
 	public static int ROWS;
 	public static int COLUMNS;
 	public static int MAXMOVES;
@@ -63,6 +65,7 @@ public class Board {
 		resetBoard(rows, columns);
 	}
 	
+	//Copy constructor
 	public Board(Board b) {
 		theBoard = new Piece[ROWS][COLUMNS];
 		for(int i = 0; i < ROWS; i++) {
@@ -86,12 +89,14 @@ public class Board {
 		return theBoard[x][y];
 	}
 	
+	//Utility value of the board
 	public double Utility() {
 		double ret = ((double)whites) / ((double)(blacks + whites));
 		ret *= 200;
 		ret -= 100;
 		return ret;
 	}
+	
 	private void resetBoard(int rows, int columns) throws BadBoardException {
 		if((rows < 1 || rows > 13) || (columns < 1 || columns > 13) || (rows % 2 == 0) || (columns % 2 == 0)) {
 			throw new BadBoardException();
@@ -169,7 +174,8 @@ public class Board {
 		boolean isChain = true;
 		
 		//Checks for errors in chaining
-		if(mov.getStart().getColor() != chainColor || mov.getState() == AttackState.NEITHER || mov.getState() == AttackState.SACRIFICE) {
+		if(mov.getStart().getColor() != chainColor/* || mov.getState() == AttackState.NEITHER || mov.getState() == AttackState.SACRIFICE*/) {
+			//In this case the turn changed, so change the chain to false
 			isChain = false;
 			previousLocations = new ArrayList<Piece.adjLoc>();
 			chainColor = mov.getStart().getColor();
@@ -254,7 +260,7 @@ public class Board {
 					if(theBoard[nextRow][nextColumn].getColor() != oppositeColor(mov.getColor())) {
 						break;
 					}
-	//				System.out.println("Something should die!");
+					//System.out.println("Something should die!");
 					theBoard[nextRow][nextColumn].setColor(Color.GRAY);
 					if(chainColor == Color.WHITE) {
 						blacks--;
@@ -611,10 +617,10 @@ public class Board {
 							// No capture move are possible
 							if(capture.isEmpty()) {
 								paika.add(new Move(piece, end, AttackState.NEITHER));
-//								paika.add(new Move(piece, end, AttackState.SACRIFICE));
+								paika.add(new Move(piece, end, AttackState.SACRIFICE));
 							}
-//							else 
-//								capture.add(new Move(piece, end, AttackState.SACRIFICE));
+							else 
+								capture.add(new Move(piece, end, AttackState.SACRIFICE));
 						}
 					}
 				}
