@@ -396,11 +396,11 @@ public class Board {
 	}
 	
 	// Gets all valid chain moves for a specific point
-	public ArrayList<Move> getValidChainMoves(adjLoc place) throws BadMoveException {
+	public ArrayList<Move> getValidChainMoves(adjLoc place) {
 		return getValidChainMoves(place.row, place.column);
 	}
 	
-	public ArrayList<Move> getValidChainMoves(int x, int y) throws BadMoveException {
+	public ArrayList<Move> getValidChainMoves(int x, int y) {
 		ArrayList<Move> capture = new ArrayList<Move>();
 		Piece start = getPiece(x,y);
 		
@@ -420,7 +420,12 @@ public class Board {
 				}
 			}
 			move.setEnd(end);
-			move.updateDirection();
+			try {
+				move.updateDirection();
+			} catch (BadMoveException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			if(move.getDirection() == previousDirection) {
 				continue;
 			}
@@ -487,32 +492,52 @@ public class Board {
 					advance = theBoard[start.row + rowAdv][start.column + colAdv];
 					withdraw = theBoard[start.row + rowWd][start.column + colWd];
 					if(advance.getColor() != move.getColor() && !advance.isEmpty()) {
-						Move newMove = new Move(start, end, AttackState.ADVANCING);
-						if(isValidMove(newMove))
+						Move newMove;
+						try {
+							newMove = new Move(start, end, AttackState.ADVANCING);
 							capture.add(newMove);
+						} catch (BadMoveException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
 					}
 					if(withdraw.getColor() != move.getColor() && !withdraw.isEmpty()) {
-						Move newMove = new Move(start, end, AttackState.WITHDRAWING);
-						if(isValidMove(newMove))
+						Move newMove;
+						try {
+							newMove = new Move(start, end, AttackState.WITHDRAWING);
 							capture.add(newMove);
+						} catch (BadMoveException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
 					}
 				}
 				// Just an advance is possible
 				else if(Piece.isValidSpace(start.row + rowAdv, start.column + colAdv)) {
 					advance = theBoard[start.row + rowAdv][start.column + colAdv];
 					if(advance.getColor() != move.getColor() && !advance.isEmpty()) {
-						Move newMove = new Move(start, end, AttackState.ADVANCING);
-						if(isValidMove(newMove))
+						Move newMove;
+						try {
+							newMove = new Move(start, end, AttackState.ADVANCING);
 							capture.add(newMove);
+						} catch (BadMoveException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
 					}
 				}
 				// Just a withdraw is possible
 				else if(Piece.isValidSpace(start.row + rowWd, start.column + colWd)) {
 					withdraw = theBoard[start.row + rowWd][start.column + colWd];
 					if(withdraw.getColor() != move.getColor() && !withdraw.isEmpty()) {
-						Move newMove = new Move(start, end, AttackState.WITHDRAWING);
-						if(isValidMove(newMove))
+						Move newMove;
+						try {
+							newMove = new Move(start, end, AttackState.WITHDRAWING);
 							capture.add(newMove);
+						} catch (BadMoveException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
 					}
 				}
 			}
@@ -521,7 +546,7 @@ public class Board {
 	}
 	
 	// Gets valid moves for a specific color on the entire board
-	public ArrayList<Move> getValidMoves(Color color) throws BadMoveException {
+	public ArrayList<Move> getValidMoves(Color color) {
 		ArrayList<Move> capture = new ArrayList<Move>();
 		ArrayList<Move> paika = new ArrayList<Move>();
 		
@@ -542,7 +567,12 @@ public class Board {
 							continue;
 						}
 						move.setEnd(end);
-						move.updateDirection();
+						try {
+							move.updateDirection();
+						} catch (BadMoveException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
 						// Can't move the same direction twice in a row
 						if(move.getDirection() == previousDirection) {
 							continue;
@@ -610,33 +640,61 @@ public class Board {
 								advance = theBoard[piece.row + rowAdv][piece.column + colAdv];
 								withdraw = theBoard[piece.row + rowWd][piece.column + colWd];
 								if(advance.getColor() != move.getColor() && !advance.isEmpty()) {
-									Move newMove = new Move(piece, end, AttackState.ADVANCING);
-									capture.add(newMove);
+									Move newMove;
+									try {
+										newMove = new Move(piece, end, AttackState.ADVANCING);
+										capture.add(newMove);
+									} catch (BadMoveException e) {
+										// TODO Auto-generated catch block
+										e.printStackTrace();
+									}
 								}
 								if(withdraw.getColor() != move.getColor() && !withdraw.isEmpty()) {
-									Move newMove = new Move(piece, end, AttackState.WITHDRAWING);
-									capture.add(newMove);
+									Move newMove;
+									try {
+										newMove = new Move(piece, end, AttackState.WITHDRAWING);
+										capture.add(newMove);
+									} catch (BadMoveException e) {
+										// TODO Auto-generated catch block
+										e.printStackTrace();
+									}
 								}
 							}
 							// Just an advance
 							else if(Piece.isValidSpace(piece.row + rowAdv, piece.column + colAdv)) {
 								advance = theBoard[piece.row + rowAdv][piece.column + colAdv];
 								if(advance.getColor() != move.getColor() && !advance.isEmpty()) {
-									Move newMove = new Move(piece, end, AttackState.ADVANCING);
-									capture.add(newMove);
+									Move newMove;
+									try {
+										newMove = new Move(piece, end, AttackState.ADVANCING);
+										capture.add(newMove);
+									} catch (BadMoveException e) {
+										// TODO Auto-generated catch block
+										e.printStackTrace();
+									}
 								}
 							}
 							// Just a withdraw
 							else if(Piece.isValidSpace(piece.row + rowWd, piece.column + colWd)) {
 								withdraw = theBoard[piece.row + rowWd][piece.column + colWd];
 								if(withdraw.getColor() != move.getColor() && !withdraw.isEmpty()) {
-									Move newMove = new Move(piece, end, AttackState.WITHDRAWING);
-									capture.add(newMove);
+									try {
+										Move newMove = new Move(piece, end, AttackState.WITHDRAWING);
+										capture.add(newMove);
+									} catch (BadMoveException e) {
+										// TODO Auto-generated catch block
+										e.printStackTrace();
+									}
 								}
 							}
 							// No capture move are possible
 							if(capture.isEmpty()) {
-								paika.add(new Move(piece, end, AttackState.NEITHER));
+								try {
+									paika.add(new Move(piece, end, AttackState.NEITHER));
+								} catch (BadMoveException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
 								//paika.add(new Move(piece, end, AttackState.SACRIFICE));
 							}
 							//else 
