@@ -97,10 +97,12 @@ public class OptionsGUI extends JFrame{
             	//will restart game with new settings
             	
             	//before creating game, check if option is valid
-            	if(currentOptions!=currentOptions.prevOption)
+            	if(!gameRunning || currentOptions.isEqual(currentOptions.prevOption) == false)
             	{
-            		currentOptions.prevOption = currentOptions;
+            		//gameRunning variable prevents isEqual running on null pointer
+            		currentOptions.prevOption =  new OptionState(currentOptions);
             		FanoronaGUI.GUI =  new FanoronaGUI(currentOptions);
+            		gameRunning = true;
             		
             	}
             	OGUI.setVisible(false);
@@ -120,10 +122,27 @@ public class OptionsGUI extends JFrame{
 		OptionState prevOption = null;
 		int oRow = 5;
 		int oCol = 13;
-		
 		public OptionState()
 		{
-			
+			//default values above
+		}
+		public OptionState(OptionState o)
+		{
+			this.startColor = o.startColor;
+			this.AIColor = o.AIColor;
+			this.oRow = o.oRow;
+			this.oCol = o.oCol;
+		}
+
+		public boolean isEqual(OptionState option) {
+			//add each option state here
+			if(	this.startColor == option.startColor &&
+				this.AIColor == option.AIColor &&
+				this.oCol == option.oCol &&
+				this.oRow == option.oRow)
+				return true;
+			else
+				return false;
 		}
 	}
 	

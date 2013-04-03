@@ -254,7 +254,6 @@ public class FanoronaGUI extends JFrame {
     	try {
 			opponent.getNewLevel();
 		} catch (BadMoveException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
     	
@@ -280,6 +279,46 @@ public class FanoronaGUI extends JFrame {
         if(playerColor == Color.BLACK)
         {
         	//NEED BETTER SUPPORT FOR THIS
+        	try {
+	    		ArrayList<Move> AIMoves;
+	    		opponent.opponentMove(board);
+				AIMoves = opponent.alphaBetaSearch();
+				
+				System.out.println("Number of AI moves to make: " + AIMoves.size());
+				
+	    		for (Move m : AIMoves) {
+	    			System.out.println(m);
+					gamePieces[m.end.row][m.end.column].pColor = opponent.getColor();
+					gamePieces[m.end.row][m.end.column].repaint();
+					//make the previous point turn gray
+					gamePieces[m.start.row][m.start.column].pColor = Color.GRAY;
+					gamePieces[m.start.row][m.start.column].repaint();
+					
+					ArrayList<Piece> piecesToColor;
+					try {
+						piecesToColor = board.move(m);
+						for(Piece p : piecesToColor) {
+		    					gamePieces[p.row][p.column].pColor = Color.GRAY;
+		    					gamePieces[p.row][p.column].repaint();
+		    			}
+					} catch (GameOverException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					prevMoveDrawn = null;
+	    	    	prevMove = null;
+	    			isMoveState2 = false;
+	    			if(!board.chain)
+	    				changeTurn();//the board will automatically change the turn, the gui needs to be updated manually though
+	    	    	//re-color captured pieces
+		    		//give ai/opponent move we ran
+		    		//draw ai/opponent move
+	    		}
+    		} catch (BadMoveException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+        	updateInfoPanel();
         }
     }
     
