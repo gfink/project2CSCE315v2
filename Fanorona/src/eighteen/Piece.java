@@ -116,15 +116,29 @@ public class Piece {
 	// Makes the adjacent locations
 	public void adjacentLocations() {
 		// Takes into account diagonals
-		if((row + column) % 2 == 0) {
-			if(isValidSpace(row - 1, column - 1))
-				adjacentLocations.add(new adjLoc(row - 1, column - 1));
-			if(isValidSpace(row - 1, column + 1))
-				adjacentLocations.add(new adjLoc(row - 1, column + 1));
-			if(isValidSpace(row + 1, column - 1))
-				adjacentLocations.add(new adjLoc(row + 1, column - 1));
-			if(isValidSpace(row + 1, column + 1))
-				adjacentLocations.add(new adjLoc(row + 1, column + 1));
+		if((Board.ROWS + Board.COLUMNS) % 4 == 0) {
+			if((row + column) % 2 != 0) {
+				if(isValidSpace(row - 1, column - 1))
+					adjacentLocations.add(new adjLoc(row - 1, column - 1));
+				if(isValidSpace(row - 1, column + 1))
+					adjacentLocations.add(new adjLoc(row - 1, column + 1));
+				if(isValidSpace(row + 1, column - 1))
+					adjacentLocations.add(new adjLoc(row + 1, column - 1));
+				if(isValidSpace(row + 1, column + 1))
+					adjacentLocations.add(new adjLoc(row + 1, column + 1));
+			}
+		}
+		else {
+			if((row + column) % 2 == 0) {
+				if(isValidSpace(row - 1, column - 1))
+					adjacentLocations.add(new adjLoc(row - 1, column - 1));
+				if(isValidSpace(row - 1, column + 1))
+					adjacentLocations.add(new adjLoc(row - 1, column + 1));
+				if(isValidSpace(row + 1, column - 1))
+					adjacentLocations.add(new adjLoc(row + 1, column - 1));
+				if(isValidSpace(row + 1, column + 1))
+					adjacentLocations.add(new adjLoc(row + 1, column + 1));
+			}
 		}
 		if(isValidSpace(row - 1, column))
 			adjacentLocations.add(new adjLoc(row - 1, column));
