@@ -11,8 +11,11 @@ public class HelpGUI extends JFrame {
 	public HelpGUI() {
 		
 		String helpTextString = 
-				"This is where the help information will go " +
-				"once we decide what that is.";
+				"To play, click a piece you want to move. Moves you can make are highlighted in yellow, and the selected piece is highlighted in green.\n" +
+				"When you click a yellow move, your move will be made plus the move of the opponent. Clicking the second location to move to commits that\n"+
+				"move. To de-select the move, click ' Cancel Move ', and to end a turn mid chain, click 'End Turn'. You cannot end your turn if a potential\n"+
+				"move has been selected. First cancel the move, then end the turn.\n\n"+
+				"Team 18\n";
 		JLabel helpText = new JLabel(helpTextString);
 		this.add(helpText,BorderLayout.NORTH);
 		setTitle("Help");

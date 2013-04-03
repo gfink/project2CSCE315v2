@@ -46,7 +46,7 @@ public class Server {
 			}
 			else {
 				System.out.println("Client connecting");
-				socket = new Socket("Aserver", 4001);
+				socket = new Socket("Travis-PC", 4001);
 			}
 			out = new PrintWriter(socket.getOutputStream(), true);
 			in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -221,6 +221,9 @@ public class Server {
 	public static void getAndSendMove() {
 		try {
 			ai.opponentMove(board);
+			ai.getNewLevel();
+			ai.getNewLevel();
+			ai.getNewLevel();
 			ArrayList<Move> moves = ai.alphaBetaSearch();
 			String message = "";
 			for(int i = 0; i < moves.size() - 1; i++) {

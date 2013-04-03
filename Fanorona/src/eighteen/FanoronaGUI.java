@@ -19,9 +19,8 @@ import eighteen.Piece.adjLoc;
 
 public class FanoronaGUI extends JFrame {
 	//TODO if choice between pieces, pick attacking or retreating
-	//TODO add to button bar buttons for, sacrifice piece, reset game
+	//TODO add to button for sacrifice piece
 	//Class members for GUI
-	JButton helpb;
 	JPanel topRow = new JPanel();	
 	JLabel blackPieces,whitePieces,movesMade,utilityVal,currentTurn;
 	PieceListener clicked;//given to every piece in a loop
@@ -37,16 +36,6 @@ public class FanoronaGUI extends JFrame {
 	AI opponent;
 	Color playerColor;
 	Boolean isMoveState2 = false;
-	/*
-	 * MAIN IS HERE
-	 */
-    public static void main(String[] args) {
-    	//the options GUI will create an instance of this object
-    	OptionsGUI.OGUI = new OptionsGUI();
-    	OptionsGUI.OGUI.setVisible(true);
-    	//GUI =  new FanoronaGUI();
-    	//start a thread waiting for the user to pick server or client, something like that
-    }
     
     public void changeTurn() {
     	if (playerTurn=="WHITE")
@@ -102,7 +91,7 @@ public class FanoronaGUI extends JFrame {
     }
     
     public void makeHelpButton() {
-    	 helpb = new JButton("Help");
+    	 JButton helpb = new JButton("Help");
          helpb.setBounds(50,60,80,30);
          helpb.addActionListener(new ActionListener() {
              public void actionPerformed(ActionEvent event) {
@@ -111,6 +100,16 @@ public class FanoronaGUI extends JFrame {
              }
          });
          topRow.add(helpb);
+    }
+    public void makeResetButton() {
+	   	JButton options = new JButton("Reset Game");
+	   	options.setBounds(50,60,80,30);
+	   	options.addActionListener(new ActionListener() {
+	        public void actionPerformed(ActionEvent event) {
+	        	FanoronaGUI.GUI = new FanoronaGUI(OptionsGUI.currentOptions);
+	        }
+	    });
+	    topRow.add(options);
     }
     public void makeGameOptionsButton() {
 	   	JButton options = new JButton("Game Options");
@@ -164,6 +163,7 @@ public class FanoronaGUI extends JFrame {
             	 if(!isMoveState2 && board.chain) {
             		System.out.print("End turn pressed\n");
             		//RUN AI
+            		//TODO try and make these streamlined using functions, and less copypaste
             		try {
         	    		ArrayList<Move> AIMoves;
         	    		opponent.opponentMove(board);
@@ -173,10 +173,6 @@ public class FanoronaGUI extends JFrame {
         				
         	    		for (Move m : AIMoves) {
         	    			System.out.println(m);
-        	  //  			for(Piece.adjLoc loc: board.previousLocations) {
-        	  // 				System.out.print(loc);
-        	  // 			}
-        	  //  			System.out.println();
         					gamePieces[m.end.row][m.end.column].pColor = opponent.getColor();
         					gamePieces[m.end.row][m.end.column].repaint();
         					//make the previous point turn gray
@@ -186,9 +182,6 @@ public class FanoronaGUI extends JFrame {
         					ArrayList<Piece> piecesToColor;
         					try {
         						piecesToColor = board.move(m);
-        		    			/*for(Piece.adjLoc prev: board.previousLocations) {
-        			    			System.out.println(prev);
-        		    			}*/
         						for(Piece p : piecesToColor) {
         		    					gamePieces[p.row][p.column].pColor = Color.GRAY;
         		    					gamePieces[p.row][p.column].repaint();
@@ -218,7 +211,7 @@ public class FanoronaGUI extends JFrame {
     
     public void resetPrevMove() {
     	//eventually display that the move was reset visually
-    	System.out.print("ResetPrevMove\n");
+    	System.out.print("Canceling selected move\n");
     	if(prevMove != null) {
 	    	for(adjLoc p : prevMove.adjacentLocations) {
 				if (gamePieces[p.row][p.column].pColor == Color.YELLOW)
@@ -252,18 +245,15 @@ public class FanoronaGUI extends JFrame {
     	game.setLayout(new BorderLayout());
     	topRow.setLayout(new FlowLayout());
     	try {
-			board = new Board(5,13);
-			//TODO use value from options
+			board = new Board(options.oRow,options.oCol);
 		} catch (BadBoardException e) {
 			e.printStackTrace();
 		}
-    	//TODO use value from options
     	opponent = new AI(options.AIColor, 5000);
     	playerColor = options.startColor;
     	try {
 			opponent.getNewLevel();
 		} catch (BadMoveException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
     	
@@ -276,6 +266,7 @@ public class FanoronaGUI extends JFrame {
     	makeMoveCancelButton();
     	makeEndTurnButton();
     	makeHelpButton();
+    	makeResetButton();
     	makeGameOptionsButton();
     	makePieceListeners();
     	game.add(topRow, BorderLayout.NORTH);
@@ -284,6 +275,51 @@ public class FanoronaGUI extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         setVisible(true);
+        //if the user is black, run the AI first
+        if(playerColor == Color.BLACK)
+        {
+        	//NEED BETTER SUPPORT FOR THIS
+        	try {
+	    		ArrayList<Move> AIMoves;
+	    		opponent.opponentMove(board);
+				AIMoves = opponent.alphaBetaSearch();
+				
+				System.out.println("Number of AI moves to make: " + AIMoves.size());
+				
+	    		for (Move m : AIMoves) {
+	    			System.out.println(m);
+					gamePieces[m.end.row][m.end.column].pColor = opponent.getColor();
+					gamePieces[m.end.row][m.end.column].repaint();
+					//make the previous point turn gray
+					gamePieces[m.start.row][m.start.column].pColor = Color.GRAY;
+					gamePieces[m.start.row][m.start.column].repaint();
+					
+					ArrayList<Piece> piecesToColor;
+					try {
+						piecesToColor = board.move(m);
+						for(Piece p : piecesToColor) {
+		    					gamePieces[p.row][p.column].pColor = Color.GRAY;
+		    					gamePieces[p.row][p.column].repaint();
+		    			}
+					} catch (GameOverException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					prevMoveDrawn = null;
+	    	    	prevMove = null;
+	    			isMoveState2 = false;
+	    			if(!board.chain)
+	    				changeTurn();//the board will automatically change the turn, the gui needs to be updated manually though
+	    	    	//re-color captured pieces
+		    		//give ai/opponent move we ran
+		    		//draw ai/opponent move
+	    		}
+    		} catch (BadMoveException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+        	updateInfoPanel();
+        }
     }
     
     class PieceListener implements ActionListener {
@@ -328,7 +364,6 @@ public class FanoronaGUI extends JFrame {
 	    				changeTurn();//the board will automatically change the turn, the gui needs to be updated manually though
 	    	    	//re-color captured pieces
 		    		//give ai/opponent move we ran
-		    		//TODO ask for ai/opponent move
 		    		//draw ai/opponent move
 	    		}
     		} catch (BadMoveException e) {
