@@ -298,6 +298,12 @@ public class Board {
 			switchTurn();
 		}
 		
+		if(whites == 0) {
+			throw new GameOverException("black");
+		}
+		if(blacks == 0) {
+			throw new GameOverException("white");
+		}
 		if(moves == MAXMOVES) {
 			String winner = "";
 			if(whites == 0) {
