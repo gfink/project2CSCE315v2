@@ -82,7 +82,7 @@ public class AI {
 		// Ensures that no incorrect chain assumptions are made
 		if(child.board.turn == myColor) {
 			ArrayList<Move> chainMoves = child.board.getValidChainMoves(previousSpot);
-			System.out.println("Found " + chainMoves.size() + " chain possiblities.");
+			//System.out.println("Found " + chainMoves.size() + " chain possiblities.");
 			for(Move move: chainMoves) {
 				Board newBoard = new Board(child.board);
 				try {
@@ -136,10 +136,10 @@ public class AI {
 	public ArrayList<Move> alphaBetaSearch() throws BadMoveException {
 		ExecutorService service = Executors.newSingleThreadExecutor();
 		try {
-			startTime = System.currentTimeMillis();
 		    Runnable runnable = new Runnable() {
 		        @Override
 		        public void run() {
+					startTime = System.currentTimeMillis();
 		        	while(true) {
 			        	TreeNode root = minMaxTree.getRoot();
 			    		getNewLevel();
@@ -176,6 +176,7 @@ public class AI {
 		catch (final InterruptedException e) {
 		}
 		catch (final TimeoutException e) {
+			service.shutdown();
 		}
 		catch (final ExecutionException e) {
 		}
