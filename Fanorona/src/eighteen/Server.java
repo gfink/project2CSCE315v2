@@ -25,6 +25,7 @@ public class Server {
 	static boolean isServer;
 	
 	public static void main(String args[]) throws IOException {
+		//Input server check
 		System.out.println("Is this the server?");
 		Scanner sysIn = new Scanner(System.in);
 		String inToken = sysIn.nextLine();
@@ -35,6 +36,7 @@ public class Server {
 			isServer = false;
 		}
 		try {
+			//Open up the connection
 			Socket socket = null;
 			ServerSocket server = null;
 			if(isServer) {
@@ -48,6 +50,8 @@ public class Server {
 				System.out.println("Client connecting");
 				socket = new Socket("Travis-PC", 4001);
 			}
+			
+			//Create the writer and reader
 			out = new PrintWriter(socket.getOutputStream(), true);
 			in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 			if(isServer) {
@@ -70,10 +74,14 @@ public class Server {
 					ai = new AI(Color.BLACK, maxTime);
 				}
 			}
+			
+			//The execution loop
 			while(!gameOver) {
 				readAndExecute();
 			}
 			System.out.println(victoryState);
+			
+			//Close the sockets
 			out.close();
 			socket.close();
 			if(isServer) {
@@ -84,7 +92,6 @@ public class Server {
 		} catch (IOException e) {
 			System.out.println("Could get IO connection");
 		} catch (BadBoardException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -94,10 +101,14 @@ public class Server {
 		out.write(message);
 	}
 	
+	//The loop call that takes in the input and sends the output
 	public static void readAndExecute() throws IOException {
+		//Read input
 		String input = in.readLine();
 		System.out.println("Received: " + input);
 		Scanner reader = new Scanner(input);
+		
+		//Look through the input
 		while(reader.hasNext()) {
 			String token = reader.next();
 			if(token.equals("WELCOME")) {
@@ -156,6 +167,7 @@ public class Server {
 				gameOver = true;
 			}
 			else {
+				//Parse the given move and execute it
 				if(System.currentTimeMillis() - time > maxTime) {
 					send("TIME");
 					send("LOSER");
@@ -224,12 +236,14 @@ public class Server {
 						gameOver = true;
 					}
 				}
+				//After parsin, send our move
 				send("OK");
 				getAndSendMove();
 			}
 		}
 	}
 	
+	//Uses the AI to compute the next move
 	public static void getAndSendMove() {
 		try {
 			ai.opponentMove(board);

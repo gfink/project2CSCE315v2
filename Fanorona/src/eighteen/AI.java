@@ -123,12 +123,13 @@ public class AI {
 	}
 	
 	static ArrayList<Move> ret = new ArrayList<Move>();
+	static long startTime;
 	
 	// Searches for the best board state and returns the corresponding moves
 	public ArrayList<Move> alphaBetaSearch() throws BadMoveException {
 		ExecutorService service = Executors.newSingleThreadExecutor();
-
 		try {
+			startTime = System.currentTimeMillis();
 		    Runnable runnable = new Runnable() {
 		        @Override
 		        public void run() {
@@ -158,6 +159,9 @@ public class AI {
 			    				minMaxTree.setRoot(child);
 			    				ret = new ArrayList<Move>(child.getMoves());
 			    			}
+			    		}
+			    		if(System.currentTimeMillis() - startTime > maxTime) {
+			    			break;
 			    		}
 		        	}
 		        }
