@@ -332,6 +332,7 @@ public class FanoronaGUI extends JFrame {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+    	updateInfoPanel();
     }
     class PieceListener implements ActionListener {
     	
