@@ -213,13 +213,9 @@ public class FanoronaGUI extends JFrame {
 		} catch (BadBoardException e) {
 			e.printStackTrace();
 		}
-    	opponent = new AI(options.AIColor, 5000);
+    	opponent = new AI(options.AIColor, 500);
     	playerColor = options.startColor;
-    	try {
-			opponent.getNewLevel();
-		} catch (BadMoveException e) {
-			e.printStackTrace();
-		}
+    	opponent.getNewLevel();
     	
     	gamePieces = new DrawnPiece[Board.ROWS][Board.COLUMNS];
     	prevMoveDrawn = null;
@@ -404,35 +400,30 @@ public class FanoronaGUI extends JFrame {
 					}
 	    		}
 	    		else if (gamePiece.pColor != Color.YELLOW && gamePiece.pColor != Color.GRAY && !isMoveState2) {
-	    			try {
-		    			//highlight all available moves, if not making a move, and if the piece clicked isn't gray
-		    			//getValidMoves(Color), returns a list of moves, List<Move>
-		    			//using the start location given by the click, iterate through List<Move> to find all available moves
-		    			//using the clicked piece to start
-		    			//then color those
-		    			ArrayList<Move> validMoves = board.getValidMoves(board.turn);
-		    			boolean ColorChanged = false;
-		    			if(validMoves.isEmpty()) {
-		    				System.out.println("No valid moves...");
-		    			}
-			    		for(Move m : validMoves) {
-			    			if (m.start.equals(pieceClicked)) {
-			    				gamePieces[m.start.row][m.start.column].selected = true;
-			    				ColorChanged = true;
-			    				gamePieces[m.end.row][m.end.column].pColor = Color.YELLOW;
-			    				gamePieces[m.end.row][m.end.column].repaint();
-			    			}
-			    		}
-			    		if(ColorChanged) {
-			    			prevMoveDrawn = gamePiece;
-			    			prevMove = pieceClicked;
-			    			isMoveState2 = true;
-			    		}
-			    		System.out.print("Clicked x:" + gamePiece.xLoc + " y:" + gamePiece.yLoc + "\n");
+	    			//highlight all available moves, if not making a move, and if the piece clicked isn't gray
+	    			//getValidMoves(Color), returns a list of moves, List<Move>
+	    			//using the start location given by the click, iterate through List<Move> to find all available moves
+	    			//using the clicked piece to start
+	    			//then color those
+	    			ArrayList<Move> validMoves = board.getValidMoves(board.turn);
+	    			boolean ColorChanged = false;
+	    			if(validMoves.isEmpty()) {
+	    				System.out.println("No valid moves...");
 	    			}
-	    			catch (BadMoveException e1)  {
-						e1.printStackTrace();
-					}
+		    		for(Move m : validMoves) {
+		    			if (m.start.equals(pieceClicked)) {
+		    				gamePieces[m.start.row][m.start.column].selected = true;
+		    				ColorChanged = true;
+		    				gamePieces[m.end.row][m.end.column].pColor = Color.YELLOW;
+		    				gamePieces[m.end.row][m.end.column].repaint();
+		    			}
+		    		}
+		    		if(ColorChanged) {
+		    			prevMoveDrawn = gamePiece;
+		    			prevMove = pieceClicked;
+		    			isMoveState2 = true;
+		    		}
+		    		System.out.print("Clicked x:" + gamePiece.xLoc + " y:" + gamePiece.yLoc + "\n");
 	    		}
     		}		
     	}

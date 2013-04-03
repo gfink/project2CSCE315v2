@@ -32,7 +32,7 @@ public class AI {
 	}
 	
 	// Adds a new level to the MiniMax tree
-	public void getNewLevel() throws BadMoveException {
+	public void getNewLevel() {
 		addLevel(minMaxTree.getRoot());
 		levels++;
 	}
@@ -41,7 +41,7 @@ public class AI {
 		return myColor;
 	}
 	
-	public void addLevel(TreeNode node) throws BadMoveException {
+	public void addLevel(TreeNode node) {
 		// If the node doesn't have children, we've reached the bottom of the tree
 		if(!node.hasChildren()) {
 			Color color = Board.oppositeColor(node.board.chainColor);
@@ -52,6 +52,9 @@ public class AI {
 				try {
 					newBoard.move(move);
 				} catch (GameOverException e) {
+					e.printStackTrace();
+				} catch (BadMoveException e) {
+					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 				TreeNode newChild = new TreeNode(newBoard);
@@ -74,7 +77,7 @@ public class AI {
 	}
 	
 	// Checks for chain possibilities of a created child node
-	public void chainCheck(TreeNode child) throws BadMoveException {
+	public void chainCheck(TreeNode child) {
 		Piece.adjLoc previousSpot = child.board.previousSpot;
 		// Ensures that no incorrect chain assumptions are made
 		if(child.board.turn == myColor) {
@@ -85,6 +88,9 @@ public class AI {
 				try {
 					newBoard.move(move);
 				} catch (GameOverException e) {
+					e.printStackTrace();
+				} catch (BadMoveException e) {
+					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 				// It's a sibling NOT a child
@@ -123,6 +129,7 @@ public class AI {
 	}
 	
 	static ArrayList<Move> ret = new ArrayList<Move>();
+	static TreeNode chosenChild;
 	static long startTime;
 	
 	// Searches for the best board state and returns the corresponding moves
@@ -133,14 +140,9 @@ public class AI {
 		    Runnable runnable = new Runnable() {
 		        @Override
 		        public void run() {
-		        	//while(true) {
+		        	while(true) {
 			        	TreeNode root = minMaxTree.getRoot();
-			    		try {
-							getNewLevel();
-						} catch (BadMoveException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
+			    		getNewLevel();
 			    		double value = 0;
 			    		// How we start iterating depends on my color and the board's turn
 			    		if (root.board.chainColor != myColor)
@@ -156,14 +158,14 @@ public class AI {
 			    		// Finds the node with the highest value
 			    		for(TreeNode child: root.getChildren()) {
 			    			if(child.traversalValue == value) {
-			    				minMaxTree.setRoot(child);
+			    				chosenChild = new TreeNode(child);
 			    				ret = new ArrayList<Move>(child.getMoves());
 			    			}
 			    		}
 			    		if(System.currentTimeMillis() - startTime > maxTime) {
-			    			//break;
+			    			break;
 			    		}
-		        	//}
+		        	}
 		        }
 		    };
 
@@ -182,6 +184,7 @@ public class AI {
 		}
 		// Fall-back for if no moves are found
 		System.out.println("No move found");
+		minMaxTree.setRoot(chosenChild);
 		return ret;
 	}
 	
