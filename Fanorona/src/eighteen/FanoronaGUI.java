@@ -30,9 +30,12 @@ public class FanoronaGUI extends JFrame {
 	DrawnPiece prevMoveDrawn;
     public static FanoronaGUI GUI;
 	//Class members for operation of game
+    Move waitingMove;
 	Board board; //contains the array of pieces and board management functions
 	Piece prevMove;
-	AttackState userPickState;
+	Piece pieceClicked;//the piece the user clicked on
+	DrawnPiece gamePiece;//the gui object the user clicked on
+	public static AttackState userPickState;
 	AI opponent;
 	Color playerColor;
 	Boolean isMoveState2 = false;
@@ -121,28 +124,7 @@ public class FanoronaGUI extends JFrame {
 	    });
 	    topRow.add(options);
     }
-    public void makeAttackWithdrawButton() {
-    	 JButton attack = new JButton("Attack");
-    	 JButton withdraw = new JButton("Withdraw");
-    	 attack.setBounds(50,60,80,30);
-    	 withdraw.setBounds(50,60,80,30);
-         attack.addActionListener(new ActionListener() {
-             public void actionPerformed(ActionEvent event) {
-            	 //if(userPickState != )
-            	 //{
-            		 
-            	 //}
-             }
-         });
-         withdraw.addActionListener(new ActionListener() {
-             public void actionPerformed(ActionEvent event) {
-            	 
-             }
-         });
-         topRow.add(attack);
-         topRow.add(withdraw);
-    }
-    
+  
     public void makeMoveCancelButton() {
     	 JButton cancelMove = new JButton("Cancel Move");
     	 cancelMove.setBounds(50,60,80,30);
@@ -162,47 +144,7 @@ public class FanoronaGUI extends JFrame {
              public void actionPerformed(ActionEvent event) {
             	 if(!isMoveState2 && board.chain) {
             		System.out.print("End turn pressed\n");
-            		//RUN AI
-            		//TODO try and make these streamlined using functions, and less copypaste
-            		try {
-        	    		ArrayList<Move> AIMoves;
-        	    		opponent.opponentMove(board);
-        				AIMoves = opponent.alphaBetaSearch();
-        				
-        				System.out.println("Number of AI moves to make: " + AIMoves.size());
-        				
-        	    		for (Move m : AIMoves) {
-        	    			System.out.println(m);
-        					gamePieces[m.end.row][m.end.column].pColor = opponent.getColor();
-        					gamePieces[m.end.row][m.end.column].repaint();
-        					//make the previous point turn gray
-        					gamePieces[m.start.row][m.start.column].pColor = Color.GRAY;
-        					gamePieces[m.start.row][m.start.column].repaint();
-        					
-        					ArrayList<Piece> piecesToColor;
-        					try {
-        						piecesToColor = board.move(m);
-        						for(Piece p : piecesToColor) {
-        		    					gamePieces[p.row][p.column].pColor = Color.GRAY;
-        		    					gamePieces[p.row][p.column].repaint();
-        		    			}
-        					} catch (GameOverException e) {
-        						// TODO Auto-generated catch block
-        						e.printStackTrace();
-        					}
-        					prevMoveDrawn = null;
-        	    	    	prevMove = null;
-        	    			if(!board.chain)
-        	    				changeTurn();//the board will automatically change the turn, the gui needs to be updated manually though
-        	    		}
-            		} catch (BadMoveException e) {
-        				// TODO Auto-generated catch block
-        				e.printStackTrace();
-        			}
-            		//RUN AI END
-            		changeTurn();
-            		board.switchTurn();//has to be called manually since it is normally called in move(), which isn't called here
-            		updateInfoPanel();
+            		runAIMove();
             	 }
              }
          });
@@ -261,7 +203,6 @@ public class FanoronaGUI extends JFrame {
     	prevMoveDrawn = null;
     	userPickState = null;
     	makePieces();
-    	makeAttackWithdrawButton();
     	makeInfoPanel();
     	makeMoveCancelButton();
     	makeEndTurnButton();
@@ -278,103 +219,104 @@ public class FanoronaGUI extends JFrame {
         //if the user is black, run the AI first
         if(playerColor == Color.BLACK)
         {
-        	//NEED BETTER SUPPORT FOR THIS
-        	try {
-	    		ArrayList<Move> AIMoves;
-	    		opponent.opponentMove(board);
-				AIMoves = opponent.alphaBetaSearch();
-				
-				System.out.println("Number of AI moves to make: " + AIMoves.size());
-				
-	    		for (Move m : AIMoves) {
-	    			System.out.println(m);
-					gamePieces[m.end.row][m.end.column].pColor = opponent.getColor();
-					gamePieces[m.end.row][m.end.column].repaint();
-					//make the previous point turn gray
-					gamePieces[m.start.row][m.start.column].pColor = Color.GRAY;
-					gamePieces[m.start.row][m.start.column].repaint();
-					
-					ArrayList<Piece> piecesToColor;
-					try {
-						piecesToColor = board.move(m);
-						for(Piece p : piecesToColor) {
-		    					gamePieces[p.row][p.column].pColor = Color.GRAY;
-		    					gamePieces[p.row][p.column].repaint();
-		    			}
-					} catch (GameOverException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-					prevMoveDrawn = null;
-	    	    	prevMove = null;
-	    			isMoveState2 = false;
-	    			if(!board.chain)
-	    				changeTurn();//the board will automatically change the turn, the gui needs to be updated manually though
-	    	    	//re-color captured pieces
-		    		//give ai/opponent move we ran
-		    		//draw ai/opponent move
-	    		}
-    		} catch (BadMoveException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-        	updateInfoPanel();
+        	runAIMove();
         }
     }
-    
-    class PieceListener implements ActionListener {
-    	public void runAIMove(Board board) {
-    		try {
-	    		ArrayList<Move> AIMoves;
-	    		opponent.opponentMove(board);
-				AIMoves = opponent.alphaBetaSearch();
-				
-				System.out.println("Number of AI moves to make: " + AIMoves.size());
-				
-	    		for (Move m : AIMoves) {
-	    			System.out.println(m);
-	  //  			for(Piece.adjLoc loc: board.previousLocations) {
-	  // 				System.out.print(loc);
-	  // 			}
-	  //  			System.out.println();
-					gamePieces[m.end.row][m.end.column].pColor = opponent.getColor();
-					gamePieces[m.end.row][m.end.column].repaint();
-					//make the previous point turn gray
-					gamePieces[m.start.row][m.start.column].pColor = Color.GRAY;
-					gamePieces[m.start.row][m.start.column].repaint();
-					
-					ArrayList<Piece> piecesToColor;
-					try {
-						piecesToColor = board.move(m);
-		    			/*for(Piece.adjLoc prev: board.previousLocations) {
-			    			System.out.println(prev);
-		    			}*/
-						for(Piece p : piecesToColor) {
-		    					gamePieces[p.row][p.column].pColor = Color.GRAY;
-		    					gamePieces[p.row][p.column].repaint();
-		    			}
-					} catch (GameOverException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+    public void DoAttackWithdraw()
+    {
+    	try{
+	    	System.out.print("Move was valid\n");
+			//make the point clicked the color of the previous point clicked
+			gamePieces[pieceClicked.row][pieceClicked.column].pColor = playerColor;
+			gamePieces[pieceClicked.row][pieceClicked.column].repaint();
+			//make the previous point turn gray and removes the green selection color
+			gamePieces[prevMoveDrawn.xLoc][prevMoveDrawn.yLoc].pColor = Color.GRAY;
+			gamePieces[prevMoveDrawn.xLoc][prevMoveDrawn.yLoc].selected = false;
+			gamePieces[prevMoveDrawn.xLoc][prevMoveDrawn.yLoc].repaint();
+			//modify potential moves back to gray
+			if(prevMove.getColor() == playerColor)
+		    	for(adjLoc p : prevMove.adjacentLocations) {
+					if (gamePieces[p.row][p.column].pColor == Color.YELLOW) {
+						gamePieces[p.row][p.column].pColor = Color.GRAY;
+						gamePieces[p.row][p.column].repaint();
 					}
-					prevMoveDrawn = null;
-	    	    	prevMove = null;
-	    			isMoveState2 = false;
-	    			if(!board.chain)
-	    				changeTurn();//the board will automatically change the turn, the gui needs to be updated manually though
-	    	    	//re-color captured pieces
-		    		//give ai/opponent move we ran
-		    		//draw ai/opponent move
-	    		}
-    		} catch (BadMoveException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				}
+	    	//returns the list of pieces that need to be painted
+	    	ArrayList<Piece> piecesToColor = board.move(waitingMove);
+	    	//re-color captured pieces
+	    	for(Piece p : piecesToColor) {
+					gamePieces[p.row][p.column].pColor = Color.GRAY;
+					gamePieces[p.row][p.column].repaint();
 			}
+			
+	    	System.out.print("Moved to x:" + gamePiece.xLoc + " y:" + gamePiece.yLoc + 
+	    					 " from x:" +prevMove.row + " y:" + prevMove.column + "\n");
+	    	//set up for next turn
+	    	prevMoveDrawn = null;
+	    	prevMove = null;
+	    	isMoveState2 = false;
+			if(!board.chain) {
+				changeTurn();//the board will automatically change the turn, the gui needs to be updated manually though
+				runAIMove();
+			}
+			updateInfoPanel();
     	}
+		catch (BadMoveException e1) {
+			e1.printStackTrace();
+			//TODO something about the GameOverException
+		}
+		catch (GameOverException e2) {
+			//TODO check if game over by win
+			//TODO check if game over by win or by too many moves
+		}
+    }
+    public void runAIMove()
+    {
+    	try {
+    		ArrayList<Move> AIMoves;
+    		opponent.opponentMove(board);
+			AIMoves = opponent.alphaBetaSearch();
+			
+			System.out.println("Number of AI moves to make: " + AIMoves.size());
+			
+    		for (Move m : AIMoves) {
+    			System.out.println(m);
+				gamePieces[m.end.row][m.end.column].pColor = opponent.getColor();
+				gamePieces[m.end.row][m.end.column].repaint();
+				//make the previous point turn gray
+				gamePieces[m.start.row][m.start.column].pColor = Color.GRAY;
+				gamePieces[m.start.row][m.start.column].repaint();
+				
+				ArrayList<Piece> piecesToColor;
+				try {
+					piecesToColor = board.move(m);
+					for(Piece p : piecesToColor) {
+	    					gamePieces[p.row][p.column].pColor = Color.GRAY;
+	    					gamePieces[p.row][p.column].repaint();
+	    			}
+				} catch (GameOverException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				prevMoveDrawn = null;
+    	    	prevMove = null;
+    			isMoveState2 = false;
+    			if(!board.chain)
+    				changeTurn();//the board will automatically change the turn, the gui needs to be updated manually though
+    	    	//re-color captured pieces
+	    		//give ai/opponent move we ran
+	    		//draw ai/opponent move
+    		}
+		} catch (BadMoveException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    }
+    class PieceListener implements ActionListener {
     	
     	public void actionPerformed(ActionEvent e) {
-    		DrawnPiece gamePiece = (DrawnPiece) e.getSource();
-    		Piece pieceClicked = board.theBoard[gamePiece.xLoc][gamePiece.yLoc];
+    		gamePiece = (DrawnPiece) e.getSource();
+    		pieceClicked = board.theBoard[gamePiece.xLoc][gamePiece.yLoc];
     		//first check if the piece clicked is an available piece
     		if (gamePiece.pColor == playerColor || gamePiece.pColor == Color.YELLOW) {
 	    		if (gamePiece.pColor == Color.YELLOW && isMoveState2) { //already selected
@@ -385,11 +327,13 @@ public class FanoronaGUI extends JFrame {
 						//prompt user if needed
 						if (moveToPlay.state == AttackState.BOTH) {
 							//TODO ask user for one, right now just set to attacking
-							System.out.print("USER REACHED CHOICE OF ADVANCING OR WITHDRAWING\n");
-							moveToPlay.state = AttackState.ADVANCING;
+							AttackWithdrawGUI.AWGUI = new AttackWithdrawGUI();
+							AttackWithdrawGUI.AWGUI.setVisible(true);
+							waitingMove=moveToPlay;
+							//moveToPlay.state = userPickState;
 						}
 						//then set the value externally
-						if (board.isValidMove(moveToPlay)) {
+						if (moveToPlay.state!=AttackState.BOTH && board.isValidMove(moveToPlay)) {
 		    				System.out.print("Move was valid\n");
 			    			//make the point clicked the color of the previous point clicked
 			    			gamePieces[pieceClicked.row][pieceClicked.column].pColor = playerColor;
@@ -422,7 +366,7 @@ public class FanoronaGUI extends JFrame {
 			    	    	isMoveState2 = false;
 			    			if(!board.chain) {
 			    				changeTurn();//the board will automatically change the turn, the gui needs to be updated manually though
-			    				runAIMove(board);
+			    				FanoronaGUI.GUI.runAIMove();
 			    			}
 			    			updateInfoPanel();
 		    			}
