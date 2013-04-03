@@ -29,6 +29,9 @@ public class AI {
 		myColor = color;
 		levels = 1;
 		maxTime = time;
+		getNewLevel();
+		getNewLevel();
+		getNewLevel();
 	}
 	
 	// Adds a new level to the MiniMax tree
@@ -139,39 +142,36 @@ public class AI {
 		    Runnable runnable = new Runnable() {
 		        @Override
 		        public void run() {
-					startTime = System.currentTimeMillis();
-		        	while(true) {
-			        	TreeNode root = minMaxTree.getRoot();
-			    		getNewLevel();
-			    		double value = 0;
-			    		// How we start iterating depends on my color and the board's turn
-			    		if (root.board.chainColor != myColor)
-			    			if(myColor == Color.WHITE)
-			    				value = maxValue(root, -999999, 999999);
-			    			else
-			    				value = minValue(root, -999999, 999999);
-			    		else
-			    			if(myColor == Color.WHITE)
-			    				value = minValue(root, -999999, 999999);
-			    			else
-			    				value = maxValue(root, -999999, 999999);
-			    		// Finds the node with the highest value
-			    		for(TreeNode child: root.getChildren()) {
-			    			if(child.traversalValue == value) {
-			    				chosenChild = new TreeNode(child);
-			    				ret = new ArrayList<Move>(child.getMoves());
-			    			}
-			    		}
-			    		if(System.currentTimeMillis() - startTime > maxTime) {
-			    			Thread.currentThread().interrupt();
-			    		}
-		        	}
+		        	TreeNode root = minMaxTree.getRoot();
+		    		getNewLevel();
+		    		double value = 0;
+		    		// How we start iterating depends on my color and the board's turn
+		    		if (root.board.chainColor != myColor)
+		    			if(myColor == Color.WHITE)
+		    				value = maxValue(root, -999999, 999999);
+		    			else
+		    				value = minValue(root, -999999, 999999);
+		    		else
+		    			if(myColor == Color.WHITE)
+		    				value = minValue(root, -999999, 999999);
+		    			else
+		    				value = maxValue(root, -999999, 999999);
+		    		// Finds the node with the highest value
+		    		for(TreeNode child: root.getChildren()) {
+		    			if(child.traversalValue == value) {
+		    				chosenChild = new TreeNode(child);
+		    				ret = new ArrayList<Move>(child.getMoves());
+		    			}
+		    		}
+		    		if(System.currentTimeMillis() - startTime > maxTime) {
+		    			Thread.currentThread().interrupt();
+		    		}
 		        }
 		    };
 
 		    Future<?> future = service.submit(runnable);
 
-		    future.get(maxTime, TimeUnit.MILLISECONDS);     // attempt the task for two minutes
+		    future.get(maxTime, TimeUnit.MILLISECONDS);
 		}
 		catch (final InterruptedException e) {
 		}
