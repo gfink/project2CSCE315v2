@@ -46,7 +46,7 @@ public class Server {
 			}
 			else {
 				System.out.println("Client connecting");
-				socket = new Socket("Aserver", 4001);
+				socket = new Socket("Travis-PC", 4001);
 			}
 			out = new PrintWriter(socket.getOutputStream(), true);
 			in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
