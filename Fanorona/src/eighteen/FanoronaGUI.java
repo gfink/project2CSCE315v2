@@ -22,7 +22,7 @@ public class FanoronaGUI extends JFrame {
 	//TODO add to button for sacrifice piece
 	//Class members for GUI
 	JPanel topRow = new JPanel();	
-	JLabel blackPieces,whitePieces,movesMade,utilityVal,currentTurn;
+	JLabel blackPieces, whitePieces, movesMade, utilityVal, currentTurn;
 	PieceListener clicked;//given to every piece in a loop
 	Container game = getContentPane();
 	private String playerTurn = "WHITE";
@@ -43,7 +43,7 @@ public class FanoronaGUI extends JFrame {
 	String winLossTieString;
     
     public void changeTurn() {
-    	if (playerTurn=="WHITE")
+    	if (playerTurn == "WHITE")
     		playerTurn = "BLACK";
     	else
     		playerTurn = "WHITE";
@@ -54,10 +54,10 @@ public class FanoronaGUI extends JFrame {
     	GridLayout Lay = new GridLayout();
     	InfoPanel.setLayout(Lay);
     	InfoPanel.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
-    	blackPieces = new JLabel("Black: "+board.blacks);
-    	whitePieces = new JLabel("White: "+board.whites);
-    	movesMade = new JLabel("Move: "+board.moves);
-    	utilityVal = new JLabel("Utility: "+board.Utility());
+    	blackPieces = new JLabel("Black: " + board.blacks);
+    	whitePieces = new JLabel("White: " + board.whites);
+    	movesMade = new JLabel("Move: " + board.moves);
+    	utilityVal = new JLabel("Utility: " + board.Utility());
     	currentTurn = new JLabel("Turn: " + playerTurn);
     	InfoPanel.add(blackPieces);
     	InfoPanel.add(whitePieces);
@@ -68,10 +68,10 @@ public class FanoronaGUI extends JFrame {
     }
     
     public void updateInfoPanel() {
-    	blackPieces.setText("Black: "+board.blacks);
-    	whitePieces.setText("White: "+board.whites);
-    	movesMade.setText("Move: "+board.moves);
-    	utilityVal.setText("Utility: "+board.Utility());
+    	blackPieces.setText("Black: " + board.blacks);
+    	whitePieces.setText("White: " + board.whites);
+    	movesMade.setText("Move: " + board.moves);
+    	utilityVal.setText("Utility: " + board.Utility());
     	currentTurn.setText("Turn: " + playerTurn);
     }
     
@@ -151,8 +151,10 @@ public class FanoronaGUI extends JFrame {
     public void sacrificePiece()
     {
     	//take the last clicked piece, check a piece is selected
-    	//turn that peice some color
+    	//turn that piece some color
     	//run the end of the turn as usual
+    	
+    	
     }
     public void makeEndTurnButton() {
     	 JButton EndTurn = new JButton("End Turn");
@@ -191,8 +193,7 @@ public class FanoronaGUI extends JFrame {
     public void makePieceListeners() {
     	clicked = new PieceListener(); 
 		for(int x= 0;x<Board.ROWS;x++) {
-        	for(int y = 0; y<Board.COLUMNS; y++)
-        	{
+        	for(int y = 0; y<Board.COLUMNS; y++) {
         		gamePieces[x][y].addActionListener(clicked);
         	}
 		}
@@ -239,15 +240,13 @@ public class FanoronaGUI extends JFrame {
         setLocationRelativeTo(null);
         setVisible(true);
         //if the user is black, run the AI first
-        if(playerColor == Color.BLACK)
-        {
+        if(playerColor == Color.BLACK) {
         	runAIMove();
         }
     }
-    public void DoAttackWithdraw()
-    {
+    public void DoAttackWithdraw() {
     	waitingMove.state = userPickState;
-    	try{
+    	try {
 	    	System.out.print("Move was valid\n");
 			//make the point clicked the color of the previous point clicked
 			gamePieces[pieceClicked.row][pieceClicked.column].pColor = playerColor;
@@ -296,8 +295,8 @@ public class FanoronaGUI extends JFrame {
 			//TODO check if game over by win or by too many moves
 		}
     }
-    public void runAIMove()
-    {
+    
+    public void runAIMove() {
     	try {
     		ArrayList<Move> AIMoves;
     		opponent.opponentMove(board);

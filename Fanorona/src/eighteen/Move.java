@@ -105,6 +105,7 @@ public class Move {
 		return true;
 	}
 	
+	//This is used in the message passing section
 	public String toString() {
 		String type = "";
 		switch(state) {
