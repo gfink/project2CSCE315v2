@@ -143,10 +143,20 @@ public class Board {
 	public Color switchTurn() {
 		chain = false;
 		turn = oppositeColor(turn);
-		System.out.println("Changing turns...");
+		//System.out.println("Changing turns...");
 		previousLocations.clear();
 		previousDirection = null;
 		//chainMoves = new ArrayList<Move>();
+		for(int i = 0; i < ROWS; i++) {
+			for(int j = 0; j < COLUMNS; j++) {
+				if(theBoard[i][j].getColor().equals(Color.GREEN)) {
+					theBoard[i][j].setColor(Color.RED);
+				}
+				if(theBoard[i][j].getColor().equals(Color.RED)) {
+					theBoard[i][j].setColor(Color.GRAY);
+				}
+			}
+		}
 		return turn;
 	}
 	
@@ -159,7 +169,7 @@ public class Board {
 		boolean isChain = true;
 		
 		//Checks for errors in chaining
-		if(mov.getStart().getColor() != chainColor) {
+		if(mov.getStart().getColor() != chainColor || mov.getState() == AttackState.NEITHER || mov.getState() == AttackState.SACRIFICE) {
 			isChain = false;
 			previousLocations = new ArrayList<Piece.adjLoc>();
 			chainColor = mov.getStart().getColor();
@@ -219,43 +229,48 @@ public class Board {
 			iterateHorizontal *= -1;
 		}
 		
-		//Keeps track of which piece we are looking at
-		int nextRow;
-		int nextColumn;
-		if(mov.getState() == AttackState.ADVANCING) {
-			nextRow = mov.getEnd().row;
-			nextColumn = mov.getEnd().column;
-		}
-		else {
-			nextRow = mov.getStart().row;
-			nextColumn = mov.getStart().column;
-		}
 		
 		// Finds the pieces being removed, and adds the updated pieces so the GUI can change them
 		ArrayList<Piece> ret = new ArrayList<Piece>();
-		try {
-			while(true) {
-				nextRow += iterateVertical;
-				nextColumn += iterateHorizontal;
-				if(!Piece.isValidSpace(nextRow, nextColumn)) {
-					break;
-				}
-				if(theBoard[nextRow][nextColumn].getColor() != oppositeColor(mov.getColor())) {
-					break;
-				}
-//				System.out.println("Something should die!");
-				theBoard[nextRow][nextColumn].setColor(Color.GRAY);
-				if(chainColor == Color.WHITE) {
-					blacks--;
-				}
-				else {
-					whites--;
-				}
-				ret.add(theBoard[nextRow][nextColumn]);
+		if(mov.getState() == AttackState.ADVANCING || mov.getState() == AttackState.WITHDRAWING) {
+			//Keeps track of which piece we are looking at
+			int nextRow;
+			int nextColumn;
+			if(mov.getState() == AttackState.ADVANCING) {
+				nextRow = mov.getEnd().row;
+				nextColumn = mov.getEnd().column;
 			}
+			else {
+				nextRow = mov.getStart().row;
+				nextColumn = mov.getStart().column;
+			}
+			try {
+				while(true) {
+					nextRow += iterateVertical;
+					nextColumn += iterateHorizontal;
+					if(!Piece.isValidSpace(nextRow, nextColumn)) {
+						break;
+					}
+					if(theBoard[nextRow][nextColumn].getColor() != oppositeColor(mov.getColor())) {
+						break;
+					}
+	//				System.out.println("Something should die!");
+					theBoard[nextRow][nextColumn].setColor(Color.GRAY);
+					if(chainColor == Color.WHITE) {
+						blacks--;
+					}
+					else {
+						whites--;
+					}
+					ret.add(theBoard[nextRow][nextColumn]);
+				}
+			}
+			finally {}
+		}
+		else if(mov.getState() == AttackState.SACRIFICE) {
+			mov.getStart().setColor(Color.GREEN);
 		}
 		// Update all the variables
-		finally {}
 		chainColor = mov.getColor();
 		previousSpot = mov.getEnd();
 		previousDirection = mov.getDirection();
@@ -268,10 +283,12 @@ public class Board {
 		
 		//Done later to not mess with mov.getColor
 		//Move the actual piece
-		theBoard[mov.getEnd().row][mov.getEnd().column].setColor(mov.getStart().getColor());
+		if(mov.getState() != AttackState.SACRIFICE) {
+			theBoard[mov.getEnd().row][mov.getEnd().column].setColor(mov.getStart().getColor());
+		}
 		theBoard[mov.getStart().row][mov.getStart().column].setColor(Color.GRAY);
 		
-		if(getValidChainMoves(mov.getEnd()).size() == 0) {
+		if(getValidChainMoves(mov.getEnd()).size() == 0 || mov.getState() == AttackState.NEITHER || mov.getState() == AttackState.SACRIFICE) {
 			switchTurn();
 		}
 		

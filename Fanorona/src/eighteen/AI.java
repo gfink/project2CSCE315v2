@@ -139,6 +139,8 @@ public class AI {
 		if(!root.hasChildren()) {
 			System.out.println("Adding Children");
 			getNewLevel();
+			getNewLevel();
+			getNewLevel();
 		}
 		double value = 0;
 		// How we start iterating depends on my color and the board's turn

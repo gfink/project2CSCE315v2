@@ -46,16 +46,29 @@ public class Server {
 			}
 			else {
 				System.out.println("Client connecting");
-				socket = new Socket("Aserver", 4001);
+				socket = new Socket("Travis-PC", 4001);
 			}
 			out = new PrintWriter(socket.getOutputStream(), true);
 			in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 			if(isServer) {
+				System.out.println("Enter rows");
+				int rows = sysIn.nextInt();
+				System.out.println("Enter columns");
+				int columns = sysIn.nextInt();
+				System.out.println("Enter max time");
+				maxTime = sysIn.nextInt();
+				sysIn.nextLine();
+				System.out.println("Enter B or W");
+				inToken = sysIn.next();
 				send("WELCOME");
-				send("INFO 9 5 B 5000");
-				board = new Board(5, 9);
-				ai = new AI(Color.WHITE, 5000);
-				maxTime = 5000;
+				send("INFO " + columns + " " + rows + " " + inToken + " " + maxTime);
+				board = new Board(rows, columns);
+				if(inToken.equals("W")) {
+					ai = new AI(Color.WHITE, maxTime);
+				}
+				else {
+					ai = new AI(Color.BLACK, maxTime);
+				}
 			}
 			while(!gameOver) {
 				readAndExecute();
@@ -78,11 +91,10 @@ public class Server {
 	
 	public static void send(String message) {
 		System.out.println("Sending: " + message);
-		out.print(message);
+		out.write(message);
 	}
 	
 	public static void readAndExecute() throws IOException {
-		while(!in.ready()) {}
 		String input = in.readLine();
 		System.out.println("Received: " + input);
 		Scanner reader = new Scanner(input);
@@ -221,13 +233,16 @@ public class Server {
 	public static void getAndSendMove() {
 		try {
 			ai.opponentMove(board);
+			ai.getNewLevel();
+			ai.getNewLevel();
+			ai.getNewLevel();
 			ArrayList<Move> moves = ai.alphaBetaSearch();
 			String message = "";
 			for(int i = 0; i < moves.size() - 1; i++) {
 				board.move(moves.get(i));
 				message += moves.get(i).toString() + " + ";
 			}
-			message += moves.get(moves.size());
+			message += moves.get(moves.size() - 1);
 			send(message);
 		} catch (BadMoveException e) {
 			send("ILLEGAL");
