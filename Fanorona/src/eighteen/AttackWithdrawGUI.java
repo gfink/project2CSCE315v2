@@ -22,6 +22,7 @@ public class AttackWithdrawGUI extends JFrame{
            public void actionPerformed(ActionEvent event) {
         	   FanoronaGUI.userPickState = AttackState.ADVANCING;
         	   FanoronaGUI.GUI.DoAttackWithdraw();
+        	   FanoronaGUI.GUI.pickingAW=false;
         	   AWGUI.setVisible(false);
            }
 		});
@@ -29,6 +30,7 @@ public class AttackWithdrawGUI extends JFrame{
            public void actionPerformed(ActionEvent event) {
         	   FanoronaGUI.userPickState = AttackState.WITHDRAWING;
         	   FanoronaGUI.GUI.DoAttackWithdraw();
+        	   FanoronaGUI.GUI.pickingAW=false;
         	   AWGUI.setVisible(false);
            }
 		});
