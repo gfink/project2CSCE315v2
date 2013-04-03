@@ -107,23 +107,33 @@ public class Board {
 		theBoard = new Piece[ROWS][COLUMNS];
 		for(int i = 0; i < ROWS; i++) {
 			for(int j = 0; j < COLUMNS; j++) {
-				//The middle row
-				if(i == ROWS/2) {
-					if(j == COLUMNS/2) {
-						theBoard[i][j] = new Piece(i, j, Color.GRAY);
-					}
-					else if(j % 2 == 0) {
-						theBoard[i][j] = new Piece(i, j, Color.WHITE);
-					}
-					else {
-						theBoard[i][j] = new Piece(i, j, Color.BLACK);
-					}
-				}
-				else if(i < ROWS/2) {
+				if(i < ROWS/2) {
 					theBoard[i][j] = new Piece(i, j, Color.BLACK);
 				}
 				else {
 					theBoard[i][j] = new Piece(i, j, Color.WHITE);
+				}
+			}
+		}
+		//The middle row
+		for(int j = 0; j < COLUMNS; j++) {
+			if(j == COLUMNS/2) {
+				theBoard[ROWS/2][j] = new Piece(ROWS/2, j, Color.GRAY);
+			}
+			else if(j < COLUMNS/2) {
+				if(j % 2 == 0) {
+					theBoard[ROWS/2][j] = new Piece(ROWS/2, j, Color.WHITE);
+				}
+				else {
+					theBoard[ROWS/2][j] = new Piece(ROWS/2, j, Color.BLACK);
+				}
+			}
+			else {
+				if(j % 2 == 0) {
+					theBoard[ROWS/2][j] = new Piece(ROWS/2, j, Color.BLACK);
+				}
+				else {
+					theBoard[ROWS/2][j] = new Piece(ROWS/2, j, Color.WHITE);
 				}
 			}
 		}
@@ -539,6 +549,10 @@ public class Board {
 	public ArrayList<Move> getValidMoves(Color color) {
 		ArrayList<Move> capture = new ArrayList<Move>();
 		ArrayList<Move> paika = new ArrayList<Move>();
+		
+		if(chain) {
+			return getValidChainMoves(previousSpot);
+		}
 		
 		for(int x=0; x < Board.ROWS; x++) {
 			for(int y=0; y < Board.COLUMNS; y++) {
