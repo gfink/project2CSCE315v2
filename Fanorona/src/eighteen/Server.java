@@ -68,10 +68,10 @@ public class Server {
 				send("INFO " + columns + " " + rows + " " + inToken + " " + maxTime);
 				board = new Board(rows, columns);
 				if(inToken.equals("W")) {
-					ai = new AI(Color.WHITE, maxTime);
+					ai = new AI(Color.WHITE, (long)(maxTime * .95));
 				}
 				else {
-					ai = new AI(Color.BLACK, maxTime);
+					ai = new AI(Color.BLACK, (long)(maxTime * .95));
 				}
 			}
 			
@@ -131,13 +131,13 @@ public class Server {
 					color = reader.next();
 				}
 				long time = reader.nextLong();
+				maxTime = time;
 				if(color.equals("B")) {
-					ai = new AI(Color.BLACK, time);
+					ai = new AI(Color.BLACK, (long)(maxTime * .95));
 				}
 				else {
-					ai = new AI(Color.WHITE, time);
+					ai = new AI(Color.WHITE, (long)(maxTime * .95));
 				}
-				maxTime = time;
 				send("READY");
 			}
 			else if(token.equals("READY")) {
