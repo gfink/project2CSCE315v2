@@ -112,7 +112,7 @@ public class OptionsGUI extends JFrame{
 		 * User should be able to start over here, change the board size, change which color they are, connect to a server, or host a game
 		 * any other options we need or want to add should be here also
 		 */
-		setSize(800,200);
+		setSize(500,150);
 		setLocationRelativeTo(null);
 	}
 	public class OptionState {

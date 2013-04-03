@@ -39,6 +39,7 @@ public class FanoronaGUI extends JFrame {
 	AI opponent;
 	Color playerColor;
 	Boolean isMoveState2 = false;
+	Boolean pickingAW = false;
     
     public void changeTurn() {
     	if (playerTurn=="WHITE")
@@ -130,13 +131,27 @@ public class FanoronaGUI extends JFrame {
     	 cancelMove.setBounds(50,60,80,30);
     	 cancelMove.addActionListener(new ActionListener() {
              public void actionPerformed(ActionEvent event) {
-            	 isMoveState2 = false;
             	 resetPrevMove();
              }
          });
          topRow.add(cancelMove);
     }
-    
+    public void makeSacrificeButton() {
+   	 JButton sMove = new JButton("Sacrifice");
+   	 sMove.setBounds(50,60,80,30);
+   	 sMove.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+            	FanoronaGUI.GUI.sacrificePiece();
+            }
+        });
+        topRow.add(sMove);
+    }
+    public void sacrificePiece()
+    {
+    	//take the last clicked piece, check a piece is selected
+    	//turn that peice some color
+    	//run the end of the turn as usual
+    }
     public void makeEndTurnButton() {
     	 JButton EndTurn = new JButton("End Turn");
     	 EndTurn.setBounds(50,60,80,30);
@@ -152,9 +167,10 @@ public class FanoronaGUI extends JFrame {
     }
     
     public void resetPrevMove() {
-    	//eventually display that the move was reset visually
-    	System.out.print("Canceling selected move\n");
-    	if(prevMove != null) {
+    	
+    	if(prevMove != null && !pickingAW) {
+    		//make sure the user isn't trying to pick attack or withdraw
+    		System.out.print("Canceling selected move\n");
 	    	for(adjLoc p : prevMove.adjacentLocations) {
 				if (gamePieces[p.row][p.column].pColor == Color.YELLOW)
 				{
@@ -205,6 +221,7 @@ public class FanoronaGUI extends JFrame {
     	makePieces();
     	makeInfoPanel();
     	makeMoveCancelButton();
+    	makeSacrificeButton();
     	makeEndTurnButton();
     	makeHelpButton();
     	makeResetButton();
@@ -224,6 +241,7 @@ public class FanoronaGUI extends JFrame {
     }
     public void DoAttackWithdraw()
     {
+    	waitingMove.state = userPickState;
     	try{
 	    	System.out.print("Move was valid\n");
 			//make the point clicked the color of the previous point clicked
@@ -254,6 +272,7 @@ public class FanoronaGUI extends JFrame {
 	    	//set up for next turn
 	    	prevMoveDrawn = null;
 	    	prevMove = null;
+	    	userPickState = null;
 	    	isMoveState2 = false;
 			if(!board.chain) {
 				changeTurn();//the board will automatically change the turn, the gui needs to be updated manually though
@@ -318,7 +337,7 @@ public class FanoronaGUI extends JFrame {
     		gamePiece = (DrawnPiece) e.getSource();
     		pieceClicked = board.theBoard[gamePiece.xLoc][gamePiece.yLoc];
     		//first check if the piece clicked is an available piece
-    		if (gamePiece.pColor == playerColor || gamePiece.pColor == Color.YELLOW) {
+    		if (gamePiece.pColor == playerColor || gamePiece.pColor == Color.YELLOW && !pickingAW) {
 	    		if (gamePiece.pColor == Color.YELLOW && isMoveState2) { //already selected
 	    			try {
 		    			Move moveToPlay = null;
@@ -330,9 +349,8 @@ public class FanoronaGUI extends JFrame {
 							AttackWithdrawGUI.AWGUI = new AttackWithdrawGUI();
 							AttackWithdrawGUI.AWGUI.setVisible(true);
 							waitingMove=moveToPlay;
-							//moveToPlay.state = userPickState;
+							pickingAW = true;
 						}
-						//then set the value externally
 						if (moveToPlay.state!=AttackState.BOTH && board.isValidMove(moveToPlay)) {
 		    				System.out.print("Move was valid\n");
 			    			//make the point clicked the color of the previous point clicked
