@@ -52,7 +52,6 @@ public class AI {
 				try {
 					newBoard.move(move);
 				} catch (GameOverException e) {
-					System.out.println("Game over");
 				}
 				TreeNode newChild = new TreeNode(newBoard);
 				node.addChild(newChild);
