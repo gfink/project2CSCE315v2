@@ -103,7 +103,7 @@ public class Board {
 		}
 		ROWS = rows;
 		COLUMNS = columns;
-		MAXMOVES = COLUMNS * 10;
+		MAXMOVES = ROWS * 10;
 		theBoard = new Piece[ROWS][COLUMNS];
 		for(int i = 0; i < ROWS; i++) {
 			for(int j = 0; j < COLUMNS; j++) {
@@ -304,7 +304,7 @@ public class Board {
 		if(blacks == 0) {
 			throw new GameOverException("white");
 		}
-		if(moves == MAXMOVES) {
+		if(moves > MAXMOVES) {
 			String winner = "";
 			if(whites == 0) {
 				if(blacks == 0) {
@@ -623,10 +623,10 @@ public class Board {
 							// No capture move are possible
 							if(capture.isEmpty()) {
 								paika.add(new Move(piece, end, AttackState.NEITHER));
-								paika.add(new Move(piece, end, AttackState.SACRIFICE));
+								//paika.add(new Move(piece, end, AttackState.SACRIFICE));
 							}
-							else 
-								capture.add(new Move(piece, end, AttackState.SACRIFICE));
+							//else 
+								//capture.add(new Move(piece, end, AttackState.SACRIFICE));
 						}
 					}
 				}

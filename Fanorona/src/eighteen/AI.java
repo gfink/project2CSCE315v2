@@ -133,7 +133,7 @@ public class AI {
 		    Runnable runnable = new Runnable() {
 		        @Override
 		        public void run() {
-		        	while(true) {
+		        	//while(true) {
 			        	TreeNode root = minMaxTree.getRoot();
 			    		try {
 							getNewLevel();
@@ -161,9 +161,9 @@ public class AI {
 			    			}
 			    		}
 			    		if(System.currentTimeMillis() - startTime > maxTime) {
-			    			break;
+			    			//break;
 			    		}
-		        	}
+		        	//}
 		        }
 		    };
 
