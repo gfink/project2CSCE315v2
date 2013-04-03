@@ -163,7 +163,7 @@ public class AI {
 			    			}
 			    		}
 			    		if(System.currentTimeMillis() - startTime > maxTime) {
-			    			break;
+			    			Thread.currentThread().interrupt();
 			    		}
 		        	}
 		        }

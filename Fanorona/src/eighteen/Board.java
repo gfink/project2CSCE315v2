@@ -423,8 +423,6 @@ public class Board {
 			try {
 				move.updateDirection();
 			} catch (BadMoveException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
 			}
 			if(move.getDirection() == previousDirection) {
 				continue;
@@ -497,8 +495,6 @@ public class Board {
 							newMove = new Move(start, end, AttackState.ADVANCING);
 							capture.add(newMove);
 						} catch (BadMoveException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
 						}
 					}
 					if(withdraw.getColor() != move.getColor() && !withdraw.isEmpty()) {
@@ -507,8 +503,6 @@ public class Board {
 							newMove = new Move(start, end, AttackState.WITHDRAWING);
 							capture.add(newMove);
 						} catch (BadMoveException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
 						}
 					}
 				}
@@ -521,8 +515,6 @@ public class Board {
 							newMove = new Move(start, end, AttackState.ADVANCING);
 							capture.add(newMove);
 						} catch (BadMoveException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
 						}
 					}
 				}
@@ -535,8 +527,6 @@ public class Board {
 							newMove = new Move(start, end, AttackState.WITHDRAWING);
 							capture.add(newMove);
 						} catch (BadMoveException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
 						}
 					}
 				}
@@ -570,8 +560,6 @@ public class Board {
 						try {
 							move.updateDirection();
 						} catch (BadMoveException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
 						}
 						// Can't move the same direction twice in a row
 						if(move.getDirection() == previousDirection) {
@@ -645,8 +633,6 @@ public class Board {
 										newMove = new Move(piece, end, AttackState.ADVANCING);
 										capture.add(newMove);
 									} catch (BadMoveException e) {
-										// TODO Auto-generated catch block
-										e.printStackTrace();
 									}
 								}
 								if(withdraw.getColor() != move.getColor() && !withdraw.isEmpty()) {
@@ -655,8 +641,6 @@ public class Board {
 										newMove = new Move(piece, end, AttackState.WITHDRAWING);
 										capture.add(newMove);
 									} catch (BadMoveException e) {
-										// TODO Auto-generated catch block
-										e.printStackTrace();
 									}
 								}
 							}
@@ -669,8 +653,6 @@ public class Board {
 										newMove = new Move(piece, end, AttackState.ADVANCING);
 										capture.add(newMove);
 									} catch (BadMoveException e) {
-										// TODO Auto-generated catch block
-										e.printStackTrace();
 									}
 								}
 							}
@@ -682,8 +664,6 @@ public class Board {
 										Move newMove = new Move(piece, end, AttackState.WITHDRAWING);
 										capture.add(newMove);
 									} catch (BadMoveException e) {
-										// TODO Auto-generated catch block
-										e.printStackTrace();
 									}
 								}
 							}
@@ -692,8 +672,6 @@ public class Board {
 								try {
 									paika.add(new Move(piece, end, AttackState.NEITHER));
 								} catch (BadMoveException e) {
-									// TODO Auto-generated catch block
-									e.printStackTrace();
 								}
 								//paika.add(new Move(piece, end, AttackState.SACRIFICE));
 							}
