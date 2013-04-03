@@ -8,8 +8,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 public class AI {
 	// Will need to implement Thread at some point in the future
@@ -133,37 +137,66 @@ public class AI {
 			minMaxTree.setRoot(new TreeNode(newBoard));
 	}
 	
+	static ArrayList<Move> ret = new ArrayList<Move>();
+	
 	// Searches for the best board state and returns the corresponding moves
 	public ArrayList<Move> alphaBetaSearch() throws BadMoveException {
-		TreeNode root = minMaxTree.getRoot();
-		if(!root.hasChildren()) {
-			System.out.println("Adding Children");
-			getNewLevel();
-			getNewLevel();
-			getNewLevel();
+		ExecutorService service = Executors.newSingleThreadExecutor();
+
+		try {
+		    Runnable r = new Runnable() {
+		        @Override
+		        public void run() {
+		        	//while(true) {
+			        	TreeNode root = minMaxTree.getRoot();
+			    		if(!root.hasChildren()) {
+			    			//System.out.println("Adding Children");
+			    			try {
+								getNewLevel();
+							} catch (BadMoveException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+			    		}
+			    		double value = 0;
+			    		// How we start iterating depends on my color and the board's turn
+			    		if (root.board.chainColor != myColor)
+			    			if(myColor == Color.WHITE)
+			    				value = maxValue(root, -999999, 999999);
+			    			else
+			    				value = minValue(root, -999999, 999999);
+			    		else
+			    			if(myColor == Color.WHITE)
+			    				value = minValue(root, -999999, 999999);
+			    			else
+			    				value = maxValue(root, -999999, 999999);
+			    		// Finds the node with the highest value
+			    		for(TreeNode child: root.getChildren()) {
+			    			if(child.traversalValue == value) {
+			    				minMaxTree.setRoot(child);
+			    				ret = new ArrayList<Move>(child.getMoves());
+			    			}
+			    		//}
+		        	}
+		        }
+		    };
+
+		    Future<?> f = service.submit(r);
+
+		    f.get(maxTime, TimeUnit.MILLISECONDS);     // attempt the task for two minutes
 		}
-		double value = 0;
-		// How we start iterating depends on my color and the board's turn
-		if (root.board.chainColor != myColor)
-			if(myColor == Color.WHITE)
-				value = maxValue(root, -999999, 999999);
-			else
-				value = minValue(root, -999999, 999999);
-		else
-			if(myColor == Color.WHITE)
-				value = minValue(root, -999999, 999999);
-			else
-				value = maxValue(root, -999999, 999999);
-		// Finds the node with the highest value
-		for(TreeNode child: root.getChildren()) {
-			if(child.traversalValue == value) {
-				minMaxTree.setRoot(child);
-				return child.getMoves();
-			}
+		catch (final InterruptedException e) {
+		}
+		catch (final TimeoutException e) {
+		}
+		catch (final ExecutionException e) {
+		}
+		finally {
+		    service.shutdown();
 		}
 		// Fall-back for if no moves are found
 		System.out.println("No move found");
-		return new ArrayList<Move>();
+		return ret;
 	}
 	
 	public double maxValue(TreeNode state, double alpha, double beta) {

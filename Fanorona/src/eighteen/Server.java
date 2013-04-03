@@ -197,11 +197,11 @@ public class Server {
 						victoryState = "WE TIE";
 						gameOver = true;
 					} catch (GameOverException e) {
-						if(e.toString().contains("tie")) {
+						if(e.getMessage().contains("tie")) {
 							send("TIE");
 							victoryState = "WE WIN!";
 						}
-						else if(e.toString().contains("white")) {
+						else if(e.getMessage().contains("white")) {
 							if(ai.getColor() == Color.WHITE) {
 								send("LOSER");
 								victoryState = "WE WIN!";
@@ -248,11 +248,11 @@ public class Server {
 			send("ILLEGAL");
 			send("LOSER");
 		} catch (GameOverException e) {
-			if(e.toString().contains("tie")) {
+			if(e.getMessage().contains("tie")) {
 				send("TIE");
 				victoryState = "WE TIE";
 			}
-			else if(e.toString().contains("white")) {
+			else if(e.getMessage().contains("white")) {
 				if(ai.getColor() == Color.WHITE) {
 					send("LOSER");
 					victoryState = "WE WIN!";
