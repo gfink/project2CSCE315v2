@@ -221,6 +221,9 @@ public class Server {
 	public static void getAndSendMove() {
 		try {
 			ai.opponentMove(board);
+			ai.getNewLevel();
+			ai.getNewLevel();
+			ai.getNewLevel();
 			ArrayList<Move> moves = ai.alphaBetaSearch();
 			String message = "";
 			for(int i = 0; i < moves.size() - 1; i++) {
