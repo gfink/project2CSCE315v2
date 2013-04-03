@@ -33,6 +33,8 @@ public class BoardPanel extends JPanel{
     		
     		// Draws diagonals not fully from top to bottom (Far left/right)
     		for(int i=2; i < rows; i += 2) {
+    			if(i == 2 && (rows + cols) % 4 == 0)
+    				i--;
     			DrawnPiece start = FanoronaGUI.GUI.gamePieces[i][0];
     			
     			// For \ diagonals
@@ -64,34 +66,67 @@ public class BoardPanel extends JPanel{
     		}
     		
     		// Draws diagonals fully extending from top to bottom
-    		for(int i=0; i < cols; i += 2) {
-    			DrawnPiece start = FanoronaGUI.GUI.gamePieces[0][i];
-    			
-    			// For \ Diagonals
-    			int endRow = rows - 1;
-    			int endCol = i + rows - 1;
-    			while(endCol >= cols || endRow >= rows) {
-    				endCol--;
-    				endRow--;
-    			}
-    			DrawnPiece end = FanoronaGUI.GUI.gamePieces[endRow][endCol];
-    			g2.drawLine(start.getX() + start.getWidth() / 2,
-	    					start.getY() + start.getHeight() / 2,
-	    					end.getX() + end.getWidth() / 2,
-	    					end.getY() + end.getHeight() / 2);
-    			
-    			// For / Diagonals
-    			endRow = rows - 1;
-    			endCol = i - rows + 1;
-    			while(endCol < 0 || endRow >= rows) {
-    				endCol++;
-    				endRow--;
-    			}
-    			end = FanoronaGUI.GUI.gamePieces[endRow][endCol];
-    			g2.drawLine(start.getX() + start.getWidth() / 2,
-	    					start.getY() + start.getHeight() / 2,
-	    					end.getX() + end.getWidth() / 2,
-	    					end.getY() + end.getHeight() / 2);
+    		if((cols + rows) % 4 == 0) {
+    			for(int i=1; i < cols; i += 2) {
+	    			DrawnPiece start = FanoronaGUI.GUI.gamePieces[0][i];
+	    			
+	    			// For \ Diagonals
+	    			int endRow = rows - 1;
+	    			int endCol = i + rows - 1;
+	    			while(endCol >= cols || endRow >= rows) {
+	    				endCol--;
+	    				endRow--;
+	    			}
+	    			DrawnPiece end = FanoronaGUI.GUI.gamePieces[endRow][endCol];
+	    			g2.drawLine(start.getX() + start.getWidth() / 2,
+		    					start.getY() + start.getHeight() / 2,
+		    					end.getX() + end.getWidth() / 2,
+		    					end.getY() + end.getHeight() / 2);
+	    			
+	    			// For / Diagonals
+	    			endRow = rows - 1;
+	    			endCol = i - rows + 1;
+	    			while(endCol < 0 || endRow >= rows) {
+	    				endCol++;
+	    				endRow--;
+	    			}
+	    			end = FanoronaGUI.GUI.gamePieces[endRow][endCol];
+	    			g2.drawLine(start.getX() + start.getWidth() / 2,
+		    					start.getY() + start.getHeight() / 2,
+		    					end.getX() + end.getWidth() / 2,
+		    					end.getY() + end.getHeight() / 2);
+	    		}
+    		}
+    		else {
+	    		for(int i=0; i < cols; i += 2) {
+	    			DrawnPiece start = FanoronaGUI.GUI.gamePieces[0][i];
+	    			
+	    			// For \ Diagonals
+	    			int endRow = rows - 1;
+	    			int endCol = i + rows - 1;
+	    			while(endCol >= cols || endRow >= rows) {
+	    				endCol--;
+	    				endRow--;
+	    			}
+	    			DrawnPiece end = FanoronaGUI.GUI.gamePieces[endRow][endCol];
+	    			g2.drawLine(start.getX() + start.getWidth() / 2,
+		    					start.getY() + start.getHeight() / 2,
+		    					end.getX() + end.getWidth() / 2,
+		    					end.getY() + end.getHeight() / 2);
+	    			
+	    			// For / Diagonals
+	    			endRow = rows - 1;
+	    			endCol = i - rows + 1;
+	    			while(endCol < 0 || endRow >= rows) {
+	    				endCol++;
+	    				endRow--;
+	    			}
+	    			end = FanoronaGUI.GUI.gamePieces[endRow][endCol];
+	    			g2.drawLine(start.getX() + start.getWidth() / 2,
+		    					start.getY() + start.getHeight() / 2,
+		    					end.getX() + end.getWidth() / 2,
+		    					end.getY() + end.getHeight() / 2);
+	    		}
     		}
     	}
 		

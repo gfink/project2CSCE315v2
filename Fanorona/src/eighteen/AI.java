@@ -22,28 +22,13 @@ public class AI {
 	private Color myColor;
 	private int levels;
 	private long maxTime;
-	Timer timer;
+	public ArrayList<Move> bestMove = new ArrayList<Move>();
 	
 	public AI(Color color, long time) {
 		minMaxTree = new Tree();
 		myColor = color;
 		levels = 1;
 		maxTime = time;
-		timer = new Timer();
-		timer.schedule(new TimerTask() {
-			public void run() {
-				try {
-					ArrayList<Move> moves = alphaBetaSearch();
-					String serverText = "";
-					for(Move move: moves)
-						serverText += (move.toString() + " ");
-					System.out.println(serverText);
-				} catch (BadMoveException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-		}, maxTime);
 	}
 	
 	// Adds a new level to the MiniMax tree
@@ -144,20 +129,17 @@ public class AI {
 		ExecutorService service = Executors.newSingleThreadExecutor();
 
 		try {
-		    Runnable r = new Runnable() {
+		    Runnable runnable = new Runnable() {
 		        @Override
 		        public void run() {
-		        	//while(true) {
+		        	while(true) {
 			        	TreeNode root = minMaxTree.getRoot();
-			    		if(!root.hasChildren()) {
-			    			//System.out.println("Adding Children");
-			    			try {
-								getNewLevel();
-							} catch (BadMoveException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							}
-			    		}
+			    		try {
+							getNewLevel();
+						} catch (BadMoveException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
 			    		double value = 0;
 			    		// How we start iterating depends on my color and the board's turn
 			    		if (root.board.chainColor != myColor)
@@ -176,14 +158,14 @@ public class AI {
 			    				minMaxTree.setRoot(child);
 			    				ret = new ArrayList<Move>(child.getMoves());
 			    			}
-			    		//}
+			    		}
 		        	}
 		        }
 		    };
 
-		    Future<?> f = service.submit(r);
+		    Future<?> future = service.submit(runnable);
 
-		    f.get(maxTime, TimeUnit.MILLISECONDS);     // attempt the task for two minutes
+		    future.get(maxTime, TimeUnit.MILLISECONDS);     // attempt the task for two minutes
 		}
 		catch (final InterruptedException e) {
 		}
