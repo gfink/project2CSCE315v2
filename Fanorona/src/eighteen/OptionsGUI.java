@@ -101,6 +101,9 @@ public class OptionsGUI extends JFrame{
             	{
             		//gameRunning variable prevents isEqual running on null pointer
             		currentOptions.prevOption =  new OptionState(currentOptions);
+            		if(gameRunning){
+            		FanoronaGUI.GUI.setVisible(false);
+            		}
             		FanoronaGUI.GUI =  new FanoronaGUI(currentOptions);
             		gameRunning = true;
             		

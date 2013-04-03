@@ -40,6 +40,7 @@ public class FanoronaGUI extends JFrame {
 	Color playerColor;
 	Boolean isMoveState2 = false;
 	Boolean pickingAW = false;
+	String winLossTieString;
     
     public void changeTurn() {
     	if (playerTurn=="WHITE")
@@ -110,6 +111,7 @@ public class FanoronaGUI extends JFrame {
 	   	options.setBounds(50,60,80,30);
 	   	options.addActionListener(new ActionListener() {
 	        public void actionPerformed(ActionEvent event) {
+	        	FanoronaGUI.GUI.setVisible(false);
 	        	FanoronaGUI.GUI = new FanoronaGUI(OptionsGUI.currentOptions);
 	        }
 	    });
@@ -195,8 +197,11 @@ public class FanoronaGUI extends JFrame {
         	}
 		}
     }
-    public FanoronaGUI()
-    {
+    public void displayEndGame() {
+    	EndGameGUI.EGGUI = new EndGameGUI();
+    	EndGameGUI.EGGUI.setVisible(true);
+    }
+    public FanoronaGUI() {
     	//DO NOT CALL THIS EVER
     }
     public FanoronaGUI(OptionsGUI.OptionState options) {
@@ -285,6 +290,8 @@ public class FanoronaGUI extends JFrame {
 			//TODO something about the GameOverException
 		}
 		catch (GameOverException e2) {
+			winLossTieString = e2.getMessage();
+			displayEndGame();
 			//TODO check if game over by win
 			//TODO check if game over by win or by too many moves
 		}
@@ -314,8 +321,8 @@ public class FanoronaGUI extends JFrame {
 	    					gamePieces[p.row][p.column].repaint();
 	    			}
 				} catch (GameOverException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					winLossTieString = e.getMessage();
+					displayEndGame();
 				}
 				prevMoveDrawn = null;
     	    	prevMove = null;
@@ -391,11 +398,10 @@ public class FanoronaGUI extends JFrame {
 					} 
 	    			catch (BadMoveException e1) {
 						e1.printStackTrace();
-						//TODO something about the GameOverException
 					}
 	    			catch (GameOverException e2) {
-		    			//TODO check if game over by win
-		    			//TODO check if game over by win or by too many moves
+	    				winLossTieString = e2.getMessage();
+	    				displayEndGame();
 					}
 	    		}
 	    		else if (gamePiece.pColor != Color.YELLOW && gamePiece.pColor != Color.GRAY && !isMoveState2) {
@@ -427,7 +433,6 @@ public class FanoronaGUI extends JFrame {
 	    			}
 	    			catch (BadMoveException e1)  {
 						e1.printStackTrace();
-						//TODO something about the GameOverException
 					}
 	    		}
     		}		
