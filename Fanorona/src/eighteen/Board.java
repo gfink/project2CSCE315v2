@@ -525,6 +525,10 @@ public class Board {
 		ArrayList<Move> capture = new ArrayList<Move>();
 		ArrayList<Move> paika = new ArrayList<Move>();
 		
+		if(chain) {
+			return getValidChainMoves(previousSpot);
+		}
+		
 		for(int x=0; x < Board.ROWS; x++) {
 			for(int y=0; y < Board.COLUMNS; y++) {
 				Piece piece = getPiece(x, y);
